@@ -1,0 +1,219 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      UserRole @default(CUSTOMER)
+  phone     String?
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  carts      Cart[]
+  orders     Order[]
+  reviews    Review[]
+
+  @@map("users")
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  image       String?
+  status      Status   @default(ACTIVE)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  stock       Int      @default(0)
+  images      Json?    // Array of image URLs
+  categoryId  Int
+  status      Status   @default(ACTIVE)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  category   Category   @relation(fields: [categoryId], references: [id])
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+  reviews    Review[]
+
+  @@map("products")
+}
+
+model Cart {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user  User       @relation(fields: [userId], references: [id])
+  items CartItem[]
+
+  @@map("carts")
+}
+
+model CartItem {
+  id        Int @id @default(autoincrement())
+  cartId    Int
+  productId Int
+  quantity  Int @default(1)
+
+  // Relations
+  cart    Cart    @relation(fields: [cartId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@unique([cartId, productId])
+  @@map("cart_items")
+}
+
+model Order {
+  id             Int         @id @default(autoincrement())
+  orderNumber    String      @unique
+  userId         Int
+  totalAmount    Decimal     @db.Decimal(10, 2)
+  status         OrderStatus @default(PENDING)
+  shippingName   String
+  shippingPhone  String
+  shippingEmail  String
+  shippingAddress String
+  shippingMethod String
+  shippingCost   Decimal     @db.Decimal(10, 2)
+  paymentMethod  String
+  paymentStatus  PaymentStatus @default(PENDING)
+  notes          String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  // Relations
+  user     User        @relation(fields: [userId], references: [id])
+  items    OrderItem[]
+  payment  Payment?
+  refunds  Refund[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2)
+
+  // Relations
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model Payment {
+  id             Int           @id @default(autoincrement())
+  orderId        Int           @unique
+  paymentMethod  String
+  amount         Decimal       @db.Decimal(10, 2)
+  status         PaymentStatus @default(PENDING)
+  midtransId     String?
+  midtransToken  String?
+  paidAt         DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  // Relations
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@map("payments")
+}
+
+model Refund {
+  id        Int          @id @default(autoincrement())
+  orderId   Int
+  amount    Decimal      @db.Decimal(10, 2)
+  reason    String
+  status    RefundStatus @default(REQUESTED)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  // Relations
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@map("refunds")
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  productId Int
+  rating    Int      // 1-5
+  comment   String?
+  status    Status   @default(ACTIVE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
+  @@map("reviews")
+}
+
+// Enums
+enum UserRole {
+  ADMIN
+  CUSTOMER
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum RefundStatus {
+  REQUESTED
+  APPROVED
+  REJECTED
+  PROCESSED
+}
