@@ -98,8 +98,40 @@ function HeroCarousel() {
   );
 }
 
+interface Category {
+  id: number;
+  nama: string;
+  slug: string;
+  description: string;
+  image: string;
+  icon: string;
+  is_active: boolean;
+  product_count: number;
+  created_at: string;
+}
+
 export default function HomePage() {
   const [selectedNews, setSelectedNews] = useState<null | 'collection' | 'collaboration' | 'workshop' | 'gallery'>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch categories dari API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/categories');
+        const data = await response.json();
+        setCategories(data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        setLoading(false);
+      }
+    };
+    
+    fetchCategories();
+  }, []);
+
   return (
     <div className="min-h-screen bg-white font-sans">
       {/* Header / Navbar (Top Navigation) */}
@@ -549,56 +581,74 @@ export default function HomePage() {
         </p>
       </div>
     
-      {/* Shop by Categories - Based on 00:13-00:14 */}
+      {/* Shop by Categories - DINAMIS */}
       <section className="py-8 md:py-12 px-4 md:px-6 bg-white">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 md:mb-10 text-gray-900">
             Shop by Categories
           </h2>
-          {/* 3 Main Categories - Larger Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-            {[
-              { name: 'CHARM SERIES', href: '/collections/charm-series', description: 'Koleksi elegan dengan sentuhan mempesona' },
-              { name: 'TAUT SERIES', href: '/collections/taut-series', description: 'Rangkaian fashion yang terhubung harmonis' },
-              { name: 'DRAWSTRING COLLECTION', href: '/collections/drawstring-collection', description: 'Kenyamanan bertemu dengan gaya modern' }
-            ].map((category) => (
-              <Link 
-                key={category.name} 
-                href={category.href} 
-                className="group block overflow-hidden rounded-xl relative hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
-              >
-                <div className="aspect-[4/5] relative">
-                  <a href={category.href}>
+          
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+            </div>
+          ) : (
+            <div className={`grid grid-cols-1 gap-6 md:gap-8 ${
+              categories.length === 1 ? 'md:grid-cols-1 max-w-md mx-auto' :
+              categories.length === 2 ? 'md:grid-cols-2 max-w-4xl mx-auto' :
+              categories.length === 3 ? 'md:grid-cols-3' :
+              categories.length === 4 ? 'md:grid-cols-2 lg:grid-cols-4' :
+              'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5'
+            }`}>
+              {categories.map((category, index) => (
+                <Link 
+                  key={category.id} 
+                  href={`/collections/${category.slug}`} 
+                  className="group block overflow-hidden rounded-xl relative hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
+                >
+                  <div className="aspect-[4/5] relative">
                     <Image
-                      src={`/img/LOGO BRAND TAUTAN RASA.jpg?text=${category.name.replace(' ', '%20')}`}
-                      alt={category.name}
+                      src={category.image}
+                      alt={category.nama}
                       width={600}
                       height={750}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
-                  </a>
-                  {/* Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 transition-all duration-500" />
-                  
-                  {/* Content */}
-                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                    <h3 className="text-2xl md:text-3xl font-bold mb-2 tracking-wide group-hover:text-yellow-400 transition-colors duration-300">
-                      {category.name}
-                    </h3>
-                    <p className="text-sm md:text-base opacity-90 group-hover:opacity-100 transition-opacity duration-300">
-                      {category.description}
-                    </p>
-                    <div className="mt-4 flex items-center text-yellow-400 font-medium">
-                      <span className="mr-2">Lihat Koleksi</span>
-                      <svg className="w-5 h-5 transform group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
+                    {/* Gradient Overlay - Variasi warna berdasarkan index */}
+                    <div className={`absolute inset-0 bg-gradient-to-t ${
+                      index % 4 === 0 ? 'from-purple-900/70 via-purple-600/40 to-transparent' :
+                      index % 4 === 1 ? 'from-amber-900/70 via-amber-600/40 to-transparent' :
+                      index % 4 === 2 ? 'from-rose-900/70 via-rose-600/40 to-transparent' :
+                      'from-emerald-900/70 via-emerald-600/40 to-transparent'
+                    } group-hover:from-black/80 transition-all duration-500`} />
+                    
+                    {/* Content */}
+                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                      <h3 className="text-2xl md:text-3xl font-bold mb-2 tracking-wide group-hover:text-yellow-400 transition-colors duration-300">
+                        {category.nama}
+                      </h3>
+                      <p className="text-sm md:text-base opacity-90 group-hover:opacity-100 transition-opacity duration-300">
+                        {category.description}
+                      </p>
+                      <div className="mt-4 flex items-center text-yellow-400 font-medium">
+                        <span className="mr-2">Lihat Koleksi</span>
+                        <svg className="w-5 h-5 transform group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {/* Fallback jika tidak ada kategori */}
+          {!loading && categories.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-xl text-gray-600">Kategori akan segera hadir!</p>
+            </div>
+          )}
         </div>
       </section>
 

@@ -8,9 +8,29 @@ import { authOptions } from "@/lib/auth"
 export async function GET() {
   try {
     const categories = await prisma.category.findMany({
-      orderBy: { createdAt: 'desc' }
+      where: { status: 'ACTIVE' }, // Only get active categories
+      orderBy: { createdAt: 'desc' },
+      include: {
+        _count: {
+          select: { products: true }
+        }
+      }
     })
-    return NextResponse.json(categories)
+
+    // Transform data for frontend compatibility
+    const transformedCategories = categories.map(category => ({
+      id: category.id,
+      nama: category.name,
+      slug: category.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      description: category.description || '',
+      image: category.image || '/img/LOGO BRAND TAUTAN RASA.jpg',
+      icon: '🌸', // Default icon, bisa ditambah field di schema nanti
+      is_active: category.status === 'ACTIVE',
+      product_count: category._count.products,
+      created_at: category.createdAt.toISOString()
+    }))
+    
+    return NextResponse.json(transformedCategories)
   } catch (error) {
     console.error("Error fetching categories:", error)
     return NextResponse.json(
@@ -33,24 +53,50 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { name, description, image } = body
+    const { nama, description, image, icon } = body
 
-    if (!name) {
+    if (!nama) {
       return NextResponse.json(
-        { error: "Category name is required" },
+        { error: "Nama kategori wajib diisi" },
+        { status: 400 }
+      )
+    }
+
+    // Check if category name already exists
+    const existingCategory = await prisma.category.findUnique({
+      where: { name: nama }
+    })
+
+    if (existingCategory) {
+      return NextResponse.json(
+        { error: "Nama kategori sudah ada" },
         { status: 400 }
       )
     }
 
     const category = await prisma.category.create({
       data: {
-        name,
-        description,
-        image
+        name: nama,
+        description: description || '',
+        image: image || '/img/LOGO BRAND TAUTAN RASA.jpg',
+        status: 'ACTIVE'
       }
     })
 
-    return NextResponse.json(category, { status: 201 })
+    // Transform response for frontend compatibility
+    const transformedCategory = {
+      id: category.id,
+      nama: category.name,
+      slug: category.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      description: category.description || '',
+      image: category.image || '/img/LOGO BRAND TAUTAN RASA.jpg',
+      icon: icon || '🌸',
+      is_active: category.status === 'ACTIVE',
+      product_count: 0,
+      created_at: category.createdAt.toISOString()
+    }
+
+    return NextResponse.json(transformedCategory, { status: 201 })
   } catch (error) {
     console.error("Error creating category:", error)
     return NextResponse.json(
