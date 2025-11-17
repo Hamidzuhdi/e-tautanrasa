@@ -11,8 +11,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "prisma db seed"
   },
-    "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+  "prisma": {
+    "seed": "ts-node -P tsconfig.seed.json prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.7.0",
