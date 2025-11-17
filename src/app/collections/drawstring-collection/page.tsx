@@ -4,8 +4,72 @@ import Link from 'next/link';
 import SearchInput from '@/components/SearchInput';
 
 export default function DrawstringCollectionPage() {
-  // Products will be loaded from database
-  const products: any[] = [];
+  // DRAWSTRING COLLECTION products from your data
+  const products = [
+    {
+      name: "Tautan Rasa - Pinkies Bumb",
+      price: "Rp185.000",
+      colors: "Available in multiple colors",
+      href: "https://id.shp.ee/C3QXqMn",
+      image: "Tautan Rasa - Pinkies Bumb.png"
+    },
+    {
+      name: "Tautan Rasa - Moonlit Silvermist",
+      price: "Rp144.000", 
+      colors: "Available in multiple colors",
+      href: "https://id.shp.ee/togM5cm",
+      image: "Tautan Rasa - Moonlit Silvermist.png"
+    },
+    {
+      name: "Tautan Rasa - Couple Black Light",
+      price: "Rp190.000",
+      colors: "Available in multiple colors",
+      href: "https://id.shp.ee/ENbe6Kg",
+      image: "Tautan Rasa - Couple Black Light.png"
+    },
+    {
+      name: "Tautan Rasa - Bloom Stripe Clamp (White Bone)",
+      price: "Rp165.000",
+      colors: "Available in multiple colors",
+      href: "https://id.shp.ee/wK1NgyB",
+      image: "Tautan Rasa - Bllom Stripe Clamp (White Bone).png"
+    },
+    {
+      name: "Tautan Rasa - Bloom Stripe Clamp (Maroon)",
+      price: "Rp165.000",
+      colors: "Available in multiple colors",
+      href: "https://id.shp.ee/wK1NgyB",
+      image: "Tautan Rasa - Bloom Stripe Clamp (Maroon).png"
+    },
+    {
+      name: "Tautan Rasa - Bloom Stripe Clamp (Milo)",
+      price: "Rp165.000",
+      colors: "Available in multiple colors",
+      href: "https://id.shp.ee/wK1NgyB",
+      image: "Tautan Rasa - Bllom Stripe Clamp (Milo).png"
+    },
+    {
+      name: "Tautan Rasa - Bloom Stripe (Navy)",
+      price: "Rp140.000",
+      colors: "Available in multiple colors",
+      href: "https://id.shp.ee/Dq7dLdo",
+      image: "Tautan Rasa - Bloom Stripe (Navy).png"
+    },
+    {
+      name: "Tautan Rasa - Bloom Stripe (Mauve)",
+      price: "Rp140.000",
+      colors: "Available in multiple colors",
+      href: "https://id.shp.ee/Dq7dLdo",
+      image: "Tautan Rasa - Bloom Stripe (Mauve).png"
+    },
+    {
+      name: "Tautan Rasa - Bloom Stripe (Brown)",
+      price: "Rp140.000",
+      colors: "Available in multiple colors",
+      href: "https://id.shp.ee/Dq7dLdo",
+      image: "Tautan Rasa - Bloom Stripe (Brown).png"
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-white font-sans">
@@ -69,13 +133,35 @@ export default function DrawstringCollectionPage() {
         </div>
       </section>
 
-      {/* Products Grid - Will be loaded from database */}
+      {/* Products Grid */}
       <section className="py-8 md:py-12 px-4 md:px-6 bg-gray-50">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center">
-            <p className="text-lg text-gray-600 mb-8">
-              Produk Drawstring Collection akan ditampilkan di sini setelah koneksi database
-            </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+            {products.map((product, index) => (
+              <Link key={index} href={product.href} className="group block product-card">
+                <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                  <div className="aspect-[3/4] relative overflow-hidden">
+                    <Image
+                      src={`/img/${product.image}`}
+                      alt={product.name}
+                      width={300}
+                      height={400}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <div className="p-3 md:p-4">
+                    <h3 
+                      className="text-sm md:text-base font-medium mb-2 text-gray-900 line-clamp-2" 
+                      data-product-name={product.name}
+                    >
+                      {product.name}
+                    </h3>
+                    <p className="text-lg md:text-xl font-bold text-red-600 mb-1">{product.price}</p>
+                    <p className="text-xs md:text-sm text-gray-500">{product.colors}</p>
+                  </div>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>

@@ -1,69 +1,41 @@
-// lib/auth.ts
-import { NextAuthOptions } from "next-auth"
-import CredentialsProvider from "next-auth/providers/credentials"
-import bcrypt from "bcryptjs"
-import { prisma } from "@/lib/prisma"
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
-export const authOptions: NextAuthOptions = {
-  providers: [
-    CredentialsProvider({
-      name: "credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
-      },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null
-        }
+const JWT_SECRET = process.env.NEXT_PUBLIC_JWT_SECRET || 'your-secret-key';
 
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email
-          }
-        })
+/**
+ * Hash password dengan bcrypt
+ */
+export async function hashPassword(password: string): Promise<string> {
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+  return hashedPassword;
+}
 
-        if (!user) {
-          return null
-        }
+/**
+ * Verifikasi password
+ */
+export async function verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
+  const isMatch = await bcrypt.compare(password, hashedPassword);
+  return isMatch;
+}
 
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password,
-          user.password
-        )
+/**
+ * Generate JWT token
+ */
+export function generateToken(data: { id: string; email: string; role: string }): string {
+  const token = jwt.sign(data, JWT_SECRET, { expiresIn: '24h' });
+  return token;
+}
 
-        if (!isPasswordValid) {
-          return null
-        }
-
-        return {
-          id: user.id.toString(),
-          email: user.email,
-          name: user.name,
-          role: user.role,
-        }
-      }
-    })
-  ],
-  session: {
-    strategy: "jwt"
-  },
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.role = user.role
-      }
-      return token
-    },
-    async session({ session, token }) {
-      if (token) {
-        session.user.id = token.sub!
-        session.user.role = token.role as string
-      }
-      return session
-    }
-  },
-  pages: {
-    signIn: "/login",
-  },
+/**
+ * Verify JWT token
+ */
+export function verifyToken(token: string): any {
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    return decoded;
+  } catch (error) {
+    return null;
+  }
 }

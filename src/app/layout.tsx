@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Providers from "@/components/Providers";
-import { ToastContainer } from "@/components/shared/Alert";
+// TypeScript may complain about side-effect CSS imports when no declaration exists.
+// Suppress the error here; consider adding a `declare module '*.css'` in a global .d.ts file later.
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import "./globals.css";
 
 const geistSans = Geist({
@@ -29,10 +31,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>
-          {children}
-          <ToastContainer />
-        </Providers>
+        {children}
       </body>
     </html>
   );

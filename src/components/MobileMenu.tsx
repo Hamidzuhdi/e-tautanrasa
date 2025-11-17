@@ -3,14 +3,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import AuthButton from './AuthButton';
 
 export default function MobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
-      {/* Tombol 3 Garis */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="md:hidden p-2 text-gray-700 hover:text-black transition-colors"
@@ -21,7 +19,6 @@ export default function MobileMenu() {
         </svg>
       </button>
 
-      {/* Overlay & Menu */}
       {isOpen && (
         <>
           <div
@@ -42,28 +39,42 @@ export default function MobileMenu() {
               <Link href="/" className="block text-lg font-medium text-gray-900 hover:text-red-600" onClick={() => setIsOpen(false)}>
                 Home
               </Link>
-              <Link href="/products" className="block text-lg font-medium text-gray-900 hover:text-red-600" onClick={() => setIsOpen(false)}>
-                Produk
-              </Link>
-              <Link href="/categories" className="block text-lg font-medium text-gray-900 hover:text-red-600" onClick={() => setIsOpen(false)}>
-                Kategori
-              </Link>
-              <Link href="/cart" className="block text-lg font-medium text-gray-900 hover:text-red-600" onClick={() => setIsOpen(false)}>
-                Keranjang
-              </Link>
-              <Link href="/#about-tautan-rasa" className="block text-lg font-medium text-gray-900 hover:text-red-600" onClick={() => setIsOpen(false)}>
-                Tentang Kami
-              </Link>
-              <Link href="/#news" className="block text-lg font-medium text-gray-900 hover:text-red-600" onClick={() => setIsOpen(false)}>
-                Berita
-              </Link>
-              
-              <hr className="my-4 border-gray-200" />
-              
-              {/* Mobile Auth Section */}
-              <div className="pt-4">
-                <AuthButton />
-              </div>
+              <button 
+                onClick={() => {
+                  setIsOpen(false);
+                  if (window.location.pathname === '/') {
+                    setTimeout(() => {
+                      const element = document.getElementById('new-arrival');
+                      if (element) {
+                        element.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }, 100);
+                  } else {
+                    window.location.href = '/#new-arrival';
+                  }
+                }}
+                className="block w-full text-left text-lg font-medium text-gray-900 hover:text-red-600"
+              >
+                New Launching
+              </button>
+              <button 
+                onClick={() => {
+                  setIsOpen(false);
+                  if (window.location.pathname === '/') {
+                    setTimeout(() => {
+                      const element = document.getElementById('best-seller');
+                      if (element) {
+                        element.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }, 100);
+                  } else {
+                    window.location.href = '/#best-seller';
+                  }
+                }}
+                className="block w-full text-left text-lg font-medium text-gray-900 hover:text-red-600"
+              >
+                Best Seller
+              </button>
             </nav>
           </div>
         </>

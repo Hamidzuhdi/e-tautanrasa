@@ -2,28 +2,46 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import SearchInput from '@/components/SearchInput';
-import { prisma } from '@/lib/prisma';
 
-async function getCharmSeriesProducts() {
-  try {
-    const category = await prisma.category.findUnique({
-      where: { name: 'Charm Series' },
-      include: {
-        products: {
-          where: { status: 'ACTIVE' },
-          orderBy: { createdAt: 'desc' }
-        }
-      }
-    });
-    return category?.products || [];
-  } catch (error) {
-    console.error('Error fetching charm series products:', error);
-    return [];
-  }
-}
-
-export default async function CharmSeriesPage() {
-  const products = await getCharmSeriesProducts();
+export default function CharmSeriesPage() {
+  // CHARM SERIES products from your data
+  const products = [
+    {
+      name: "Tautan Rasa Charm Era - Ballerina Grace",
+      price: "Rp177.000",
+      colors: "Available in multiple colors",
+      href: "https://id.shp.ee/hHmUcgC",
+      image: "Tautan Rasa - Ballerina Grace.png"
+    },
+    {
+      name: "Tautan Rasa Charm Era - Ocean Bloom",
+      price: "Rp187.000", 
+      colors: "Available in multiple colors",
+      href: "https://id.shp.ee/hHmUcgC",
+      image: "Tautan Rasa - Ocean Bloom.png"
+    },
+    {
+      name: "Tautan Rasa Charm Era - Amora Rose",
+      price: "Rp182.000",
+      colors: "Available in multiple colors",
+      href: "https://id.shp.ee/hHmUcgC",
+      image: "Tautan Rasa - Amora Rose.png"
+    },
+    {
+      name: "Tautan Rasa Charm Era - Cherry Blossom",
+      price: "Rp182.000",
+      colors: "Available in multiple colors",
+      href: "https://id.shp.ee/hHmUcgC",
+      image: "Tautan Rasa - Cherry Blossom.png"
+    },
+    {
+      name: "Tautan Rasa Charm Era - Secret Petal",
+      price: "Rp182.000",
+      colors: "Available in multiple colors",
+      href: "https://id.shp.ee/hHmUcgC",
+      image: "Tautan Rasa - Secret Petal.png"
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-white font-sans">
@@ -90,46 +108,33 @@ export default async function CharmSeriesPage() {
       {/* Products Grid */}
       <section className="py-8 md:py-12 px-4 md:px-6 bg-gray-50">
         <div className="max-w-7xl mx-auto">
-          {products.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6">
-              {products.map((product: any, index: number) => (
-                <Link key={product.id} href={`/products/${product.slug}`} className="group block product-card">
-                  <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                    <div className="aspect-[3/4] relative overflow-hidden">
-                      <Image
-                        src={product.images && product.images[0] ? product.images[0] : `/img/LOGO BRAND TAUTAN RASA.jpg`}
-                        alt={product.name}
-                        width={300}
-                        height={400}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                    <div className="p-3 md:p-4">
-                      <h3 
-                        className="text-sm md:text-base font-medium mb-2 text-gray-900 line-clamp-2" 
-                        data-product-name={product.name}
-                      >
-                        {product.name}
-                      </h3>
-                      <p className="text-lg md:text-xl font-bold text-red-600 mb-1">
-                        Rp {product.price.toLocaleString('id-ID')}
-                      </p>
-                      <p className="text-xs md:text-sm text-gray-500">Stock: {product.stock}</p>
-                    </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6">
+            {products.map((product, index) => (
+              <Link key={index} href={product.href} className="group block product-card">
+                <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                  <div className="aspect-[3/4] relative overflow-hidden">
+                    <Image
+                      src={`/img/${product.image}`}
+                      alt={product.name}
+                      width={300}
+                      height={400}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
                   </div>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-lg text-gray-600 mb-4">
-                Belum ada produk Charm Series
-              </p>
-              <p className="text-sm text-gray-500">
-                Produk akan ditambahkan melalui Admin Dashboard
-              </p>
-            </div>
-          )}
+                  <div className="p-3 md:p-4">
+                    <h3 
+                      className="text-sm md:text-base font-medium mb-2 text-gray-900 line-clamp-2" 
+                      data-product-name={product.name}
+                    >
+                      {product.name}
+                    </h3>
+                    <p className="text-lg md:text-xl font-bold text-red-600 mb-1">{product.price}</p>
+                    <p className="text-xs md:text-sm text-gray-500">{product.colors}</p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 

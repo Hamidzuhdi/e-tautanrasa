@@ -7,8 +7,6 @@ import { useState, useEffect } from 'react';
 import SearchInput from '@/components/SearchInput';
 import NavigationButtons from '@/components/NavigationButtons';
 import MobileMenu from '@/components/MobileMenu';
-import AuthButton from '@/components/AuthButton';
-import CartButton from '@/components/CartButton';
 
 // Hero Carousel Component
 function HeroCarousel() {
@@ -98,40 +96,8 @@ function HeroCarousel() {
   );
 }
 
-interface Category {
-  id: number;
-  nama: string;
-  slug: string;
-  description: string;
-  image: string;
-  icon: string;
-  is_active: boolean;
-  product_count: number;
-  created_at: string;
-}
-
 export default function HomePage() {
   const [selectedNews, setSelectedNews] = useState<null | 'collection' | 'collaboration' | 'workshop' | 'gallery'>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  // Fetch categories dari API
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch('/api/categories');
-        const data = await response.json();
-        setCategories(data);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching categories:', error);
-        setLoading(false);
-      }
-    };
-    
-    fetchCategories();
-  }, []);
-
   return (
     <div className="min-h-screen bg-white font-sans">
       {/* Header / Navbar (Top Navigation) */}
@@ -140,7 +106,7 @@ export default function HomePage() {
           {/* Desktop Layout */}
           <div className="hidden md:flex justify-between items-center">
             <div className="text-2xl md:text-3xl font-bold text-black tracking-wide">
-              TAUTAN RASA HALO
+              TAUTAN RASA
             </div>
             
             {/* Desktop Navigation - Simplified to 2 menus */}
@@ -149,8 +115,6 @@ export default function HomePage() {
             <div className="flex items-center space-x-4">
               <span className="text-sm font-medium text-gray-700 hidden sm:block">IDR Rp <span className="font-bold">▽</span></span>
               <SearchInput className="flex" />
-              <CartButton />
-              <AuthButton />
             </div>
           </div>
 
@@ -417,35 +381,112 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Best Seller Section */}
-      <section id="best-seller" className="py-8 md:py-12 px-4 md:px-6 bg-gray-50">
+      {/* New Launching Section (Atala Skirt) - Based on 00:02-00:05 */}
+      <section id="new-arrival" className="py-8 md:py-12 px-4 md:px-6 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 md:mb-10 text-gray-900">
-            Best Seller
+            New Launching - Drawstring Collection
           </h2>
-          <div className="text-center">
-            <p className="text-lg text-gray-600 mb-8">
-              Produk terlaris akan ditampilkan di sini
-            </p>
+          {/* Grid optimized for many items in the video */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 md:gap-4 justify-items-center">
+            {[
+              'Pinkies Bumb', 'Moonlit Silvermist', 'Couple Black Light', 'Bloom Stripe Clamp (White Bone)', 'Bloom Stripe Clamp (Maroon)', 'Bloom Stripe Clamp (Milo)', 'Bloom Stripe (Navy)', 
+              'Bloom Stripe (Mauve)', 'Bloom Stripe (Brown)'
+            ].map((productName, index) => {
+              // Generate image path based on product name with special handling for naming inconsistencies
+              let imagePath = `/img/Tautan Rasa - ${productName}.png`;
+              
+              // Handle special case for "Bloom Stripe Clamp (Milo)" which has "Bllom" in filename
+              if (productName === 'Bloom Stripe Clamp (Milo)') {
+                imagePath = '/img/Tautan Rasa - Bllom Stripe Clamp (Milo).png';
+              }
+              // Handle special case for "Bloom Stripe Clamp (White Bone)" which has "Bllom" in filename
+              if (productName === 'Bloom Stripe Clamp (White Bone)') {
+                imagePath = '/img/Tautan Rasa - Bllom Stripe Clamp (White Bone).png';
+              }
+              
+              // Generate href based on product name mapping
+              let productHref = `/products/tautan-rasa-${productName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+              
+              // Map specific products to Shopee links
+              if (productName === 'Pinkies Bumb') {
+                productHref = 'https://id.shp.ee/C3QXqMn';
+              } else if (productName === 'Moonlit Silvermist') {
+                productHref = 'https://id.shp.ee/togM5cm';
+              } else if (productName === 'Couple Black Light') {
+                productHref = 'https://id.shp.ee/ENbe6Kg';
+              } else if (productName.includes('Bloom Stripe Clamp')) {
+                productHref = 'https://id.shp.ee/wK1NgyB';
+              } else if (productName.includes('Bloom Stripe (')) {
+                productHref = 'https://id.shp.ee/Dq7dLdo';
+              }
+              
+              return (
+                <Link 
+                  key={index} 
+                  href={productHref} 
+                  className="text-center group hover:opacity-80 transition-opacity duration-200 w-full"
+                >
+                  <div className="aspect-[3/4] w-full bg-gray-200 rounded-lg shadow-sm overflow-hidden">
+                    <a href={productHref}>
+                      <Image
+                        src={imagePath}
+                        alt={`Tautan Rasa ${productName}`}
+                        width={300}
+                        height={400}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      />
+                    </a>
+                  </div>
+                  <p className="mt-1 md:mt-2 text-xs md:text-sm text-gray-700 font-medium" data-product-name={`Tautan Rasa ${productName}`}>{productName}</p>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* You May Also Like Section */}
-      <section id="you-may-like" className="py-8 md:py-12 px-4 md:px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 md:mb-10 text-gray-900">
-            You May Also Like
-          </h2>
-          <div className="text-center">
-            <p className="text-lg text-gray-600 mb-8">
-              Rekomendasi produk akan ditampilkan di sini
+      {/* New Launching Section 2 (Charm Series) - 100% FIX: NO BLLOM, NO 404 */}
+<section className="py-8 md:py-12 px-4 md:px-6 bg-white">
+  <div className="max-w-7xl mx-auto">
+    <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 md:mb-10 text-gray-900">
+      Charm Series
+    </h2>
+    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 md:gap-4 justify-items-center">
+      {[
+        'Ballerina Grace',
+        'Ocean Bloom',
+        'Amora Rose',
+        'Cherry Blossom',
+        'Secret Petal'
+      ].map((productName, index) => {
+        // PAKAI NAMA FILE YANG SAMA DENGAN JUDUL → TIDAK ADA BLLOM
+        const imagePath = `/img/Tautan Rasa - ${productName}.png`;
+
+        return (
+          <Link
+            key={index}
+            href="https://id.shp.ee/hHmUcgC"
+            className="text-center group hover:opacity-80 transition-opacity duration-200 w-full"
+          >
+            <div className="aspect-[3/4] w-full bg-gray-200 rounded-lg shadow-sm overflow-hidden">
+              <Image
+                src={imagePath}
+                alt={`Tautan Rasa ${productName}`}
+                width={300}
+                height={400}
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+            <p className="mt-1 md:mt-2 text-xs md:text-sm text-gray-700 font-medium" data-product-name={`Tautan Rasa ${productName} Charm Series`}>
+              {productName}
             </p>
-          </div>
-        </div>
-      </section>
-
-
+          </Link>
+        );
+      })}
+    </div>
+  </div>
+</section>
 
       {/* News Section - Full Height with Overlay */}
       <section id='news' className="bg-gray-800 text-white py-8 md:py-12 px-4 md:px-6">
@@ -572,7 +613,111 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Best Seller Section - Based on 00:09-00:12 */}
+      <section id="best-seller" className="py-8 md:py-12 px-4 md:px-6 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 md:mb-10 text-gray-900">
+            Best Seller
+          </h2>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            {/* Produk 1: Bloom Stripe Mauve */}
+            <Link href="https://id.shp.ee/Dq7dLdo" className="group block product-card">
+              <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <div className="aspect-[3/4] relative overflow-hidden">
+                  <a href="https://id.shp.ee/Dq7dLdo">
+                    <Image
+                      src="/img/Tautan Rasa - Bloom Stripe (Mauve).png"
+                      alt="Bloom Stripe Mauve"
+                      width={300}
+                      height={400}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </a>
+                </div>
+                <div className="p-3 md:p-4">
+                  <h3 className="text-sm md:text-base font-medium mb-2 text-gray-900 line-clamp-2" data-product-name="Lowee Pants - Celana Panjang Kantor Polos Trendy Wanita">
+                    Soft Plum Flower
+                  </h3>
+                  <p className="text-lg md:text-xl font-bold text-red-600">Rp140.000</p>
+                  <p className="text-xs md:text-sm text-gray-500 line-clamp-1">Rope in Mauve</p>
+                </div>
+              </div>
+            </Link>
 
+            {/* Produk 2: Bloom Stripe Calm */}
+            <Link href="https://id.shp.ee/wK1NgyB" className="group block">
+              <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <div className="aspect-[3/4] relative overflow-hidden">
+                  <a href="https://id.shp.ee/wK1NgyB">
+                    <Image
+                      src="/img/Tautan Rasa - Bloom Stripe Clamp (Maroon).png"
+                      alt="Bloom Stripe Calmp"
+                      width={300}
+                      height={400}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </a>
+                </div>
+                <div className="p-3 md:p-4">
+                  <h3 className="text-sm md:text-base font-medium mb-2 text-gray-900 line-clamp-2">
+                    Bloom Stripe Clamp - Rosse Flower
+                  </h3>
+                  <p className="text-lg md:text-xl font-bold text-red-600">Rp165.000</p>
+                  <p className="text-xs md:text-sm text-gray-500 line-clamp-1">New Clamp Charm</p>
+                </div>
+              </div>
+            </Link>
+
+            {/* Produk 3: Mariposa Dream */}
+            <Link href="https://shopee.co.id/product/1498500791/42220245010?d_id=9f44f" className="group block">
+              <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <div className="aspect-[3/4] relative overflow-hidden">
+                  <a href="https://shopee.co.id/product/1498500791/42220245010?d_id=9f44f">
+                    <Image
+                      src="/img/Tautan Rasa-Mariposa Dream.png"
+                      alt="Mariposa Dream"
+                      width={300}
+                      height={400}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </a>
+                </div>
+                <div className="p-3 md:p-4">
+                  <h3 className="text-sm md:text-base font-medium mb-2 text-gray-900 line-clamp-2">
+                    Forget Me Not Flower - Gold Titanium Grade A
+                  </h3>
+                  <p className="text-lg md:text-xl font-bold text-red-600">Rp190.000</p>
+                  <p className="text-xs md:text-sm text-gray-500 line-clamp-1">Feminim, Charm, Classy</p>
+                </div>
+              </div>
+            </Link>
+
+            {/* Produk 4: Elyra Classic Chain */}
+            <Link href="https://id.shp.ee/x2yUtC7" className="group block">
+              <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <div className="aspect-[3/4] relative overflow-hidden">
+                  <a href="https://id.shp.ee/x2yUtC7">
+                    <Image
+                      src="/img/Tautan Rasa-Elyra Classic Chain.png"
+                      alt="Elyra Classic Chain"
+                      width={300}
+                      height={400}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </a>
+                </div>
+                <div className="p-3 md:p-4">
+                  <h3 className="text-sm md:text-base font-medium mb-2 text-gray-900 line-clamp-2">
+                    Her New Modesty
+                  </h3>
+                  <p className="text-lg md:text-xl font-bold text-red-600">Rp197.000</p>
+                  <p className="text-xs md:text-sm text-gray-500 line-clamp-1">support 4 charm feeling blue</p>
+                </div>
+              </div>
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* Tagline Section - Based on 00:12 */}
       <div className="bg-gray-100 py-6 md:py-8 text-center px-4">
@@ -581,78 +726,182 @@ export default function HomePage() {
         </p>
       </div>
     
-      {/* Shop by Categories - DINAMIS */}
+      {/* Shop by Categories - Based on 00:13-00:14 */}
       <section className="py-8 md:py-12 px-4 md:px-6 bg-white">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 md:mb-10 text-gray-900">
             Shop by Categories
           </h2>
-          
-          {loading ? (
-            <div className="flex justify-center py-12">
-              <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
-            </div>
-          ) : (
-            <div className={`grid grid-cols-1 gap-6 md:gap-8 ${
-              categories.length === 1 ? 'md:grid-cols-1 max-w-md mx-auto' :
-              categories.length === 2 ? 'md:grid-cols-2 max-w-4xl mx-auto' :
-              categories.length === 3 ? 'md:grid-cols-3' :
-              categories.length === 4 ? 'md:grid-cols-2 lg:grid-cols-4' :
-              'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5'
-            }`}>
-              {categories.map((category, index) => (
-                <Link 
-                  key={category.id} 
-                  href={`/collections/${category.slug}`} 
-                  className="group block overflow-hidden rounded-xl relative hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
-                >
-                  <div className="aspect-[4/5] relative">
+          {/* 3 Main Categories - Larger Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+            {[
+              { name: 'CHARM SERIES', href: '/collections/charm-series', description: 'Koleksi elegan dengan sentuhan mempesona' },
+              { name: 'TAUT SERIES', href: '/collections/taut-series', description: 'Rangkaian fashion yang terhubung harmonis' },
+              { name: 'DRAWSTRING COLLECTION', href: '/collections/drawstring-collection', description: 'Kenyamanan bertemu dengan gaya modern' }
+            ].map((category) => (
+              <Link 
+                key={category.name} 
+                href={category.href} 
+                className="group block overflow-hidden rounded-xl relative hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
+              >
+                <div className="aspect-[4/5] relative">
+                  <a href={category.href}>
                     <Image
-                      src={category.image}
-                      alt={category.nama}
+                      src={`/img/LOGO BRAND TAUTAN RASA.jpg?text=${category.name.replace(' ', '%20')}`}
+                      alt={category.name}
                       width={600}
                       height={750}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
-                    {/* Gradient Overlay - Variasi warna berdasarkan index */}
-                    <div className={`absolute inset-0 bg-gradient-to-t ${
-                      index % 4 === 0 ? 'from-purple-900/70 via-purple-600/40 to-transparent' :
-                      index % 4 === 1 ? 'from-amber-900/70 via-amber-600/40 to-transparent' :
-                      index % 4 === 2 ? 'from-rose-900/70 via-rose-600/40 to-transparent' :
-                      'from-emerald-900/70 via-emerald-600/40 to-transparent'
-                    } group-hover:from-black/80 transition-all duration-500`} />
-                    
-                    {/* Content */}
-                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                      <h3 className="text-2xl md:text-3xl font-bold mb-2 tracking-wide group-hover:text-yellow-400 transition-colors duration-300">
-                        {category.nama}
-                      </h3>
-                      <p className="text-sm md:text-base opacity-90 group-hover:opacity-100 transition-opacity duration-300">
-                        {category.description}
-                      </p>
-                      <div className="mt-4 flex items-center text-yellow-400 font-medium">
-                        <span className="mr-2">Lihat Koleksi</span>
-                        <svg className="w-5 h-5 transform group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                        </svg>
-                      </div>
+                  </a>
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 transition-all duration-500" />
+                  
+                  {/* Content */}
+                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                    <h3 className="text-2xl md:text-3xl font-bold mb-2 tracking-wide group-hover:text-yellow-400 transition-colors duration-300">
+                      {category.name}
+                    </h3>
+                    <p className="text-sm md:text-base opacity-90 group-hover:opacity-100 transition-opacity duration-300">
+                      {category.description}
+                    </p>
+                    <div className="mt-4 flex items-center text-yellow-400 font-medium">
+                      <span className="mr-2">Lihat Koleksi</span>
+                      <svg className="w-5 h-5 transform group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
                     </div>
                   </div>
-                </Link>
-              ))}
-            </div>
-          )}
-
-          {/* Fallback jika tidak ada kategori */}
-          {!loading && categories.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-xl text-gray-600">Kategori akan segera hadir!</p>
-            </div>
-          )}
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
+      {/* You May Also Like / Products Section - Based on 00:15 */}
+      <section className="py-8 md:py-12 px-4 md:px-6 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 md:mb-10 text-gray-900">
+        You May Also Like
+          </h2>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        {/* 1. Ammi Pink Ace */}
+        <Link href="https://id.shp.ee/YJ8wZXg" className="group block">
+          <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
+            <div className="aspect-[3/4] relative overflow-hidden">
+          <a href="https://id.shp.ee/YJ8wZXg">
+            <Image
+              src="/img/Tautan Rasa-Ammi Pink Ace.png"
+              alt="Ammi Pink Ace"
+              width={300}
+              height={400}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          </a>
+            </div>
+            <div className="p-3 md:p-4">
+          <h3 className="text-sm md:text-base font-medium mb-2 text-gray-900 line-clamp-2">
+            Feminim, Sporty, and Classy.
+          </h3>
+          <p className="text-lg md:text-xl font-bold text-red-600">Rp170.000</p>
+            </div>
+          </div>
+        </Link>
 
+        {/* 2. Fleur Forever */}
+        <Link href="https://id.shp.ee/Pg7xFeo" className="group block">
+          <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
+            <div className="aspect-[3/4] relative overflow-hidden">
+          <a href="https://id.shp.ee/Pg7xFeo">
+            <Image
+              src="/img/Tautan Rasa-Fleur Forever.png"
+              alt="Fleur Forever"
+              width={300}
+              height={400}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          </a>
+            </div>
+            <div className="p-3 md:p-4">
+          <h3 className="text-sm md:text-base font-medium mb-2 text-gray-900 line-clamp-2">
+            Gold Titanium Grade A
+          </h3>
+          <p className="text-lg md:text-xl font-bold text-red-600">Rp190.000</p>
+            </div>
+          </div>
+        </Link>
+
+        {/* 3. Mariposa Dream */}
+        <Link href="https://shopee.co.id/product/1498500791/42220245010?d_id=9f44f" className="group block">
+          <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
+            <div className="aspect-[3/4] relative overflow-hidden">
+          <a href="https://shopee.co.id/product/1498500791/42220245010?d_id=9f44f">
+            <Image
+              src="/img/Tautan Rasa-Mariposa Dream.png"
+              alt="Mariposa Dream"
+              width={300}
+              height={400}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          </a>
+            </div>
+            <div className="p-3 md:p-4">
+          <h3 className="text-sm md:text-base font-medium mb-2 text-gray-900 line-clamp-2">
+            Feminim, Charm, and Classy
+          </h3>
+          <p className="text-lg md:text-xl font-bold text-red-600">Rp. 190.000</p>
+            </div>
+          </div>
+        </Link>
+        
+        {/* 4. Blue Plum Blossom */}
+        <Link href="https://id.shp.ee/bpFvcZS" className="group block">
+          <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
+            <div className="aspect-[3/4] relative overflow-hidden">
+          <a href="https://id.shp.ee/bpFvcZS">
+            <Image
+              src="/img/Tautan Rasa-Blue Plum Blossom.png"
+              alt="Blue Plum Blossom"
+              width={300}
+              height={400}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          </a>
+            </div>
+            <div className="p-3 md:p-4">
+          <h3 className="text-sm md:text-base font-medium mb-2 text-gray-900 line-clamp-2">
+            The Stars On Grace
+          </h3>
+          <p className="text-lg md:text-xl font-bold text-red-600">Rp115.000</p>
+            </div>
+          </div>
+        </Link>
+        { /* 5. Elyra Classic Chain */}
+        <Link href="https://id.shp.ee/x2yUtC7" className="group block">
+          <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
+            <div className="aspect-[3/4] relative overflow-hidden">
+          <a href="https://id.shp.ee/x2yUtC7">
+            <Image
+              src="/img/Tautan Rasa-Elyra Classic Chain.png"
+              alt="Elyra Classic Chain"
+              width={300}
+              height={400}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          </a>
+            </div>
+            <div className="p-3 md:p-4">
+          <h3 className="text-sm md:text-base font-medium mb-2 text-gray-900 line-clamp-2">
+            Her New Modesty - Support 4 Charm Feeling Blue
+          </h3>
+          <p className="text-lg md:text-xl font-bold text-red-600">Rp197.000</p>
+            </div>
+          </div>
+        </Link>
+          </div>
+        </div>
+      </section>
 
 
 

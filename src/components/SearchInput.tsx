@@ -50,7 +50,7 @@ export default function SearchInput({ className = '' }: { className?: string }) 
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Cari produk..."
-        className="w-full md:w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+        className="w-full md:w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
       />
       <button
         type="submit"

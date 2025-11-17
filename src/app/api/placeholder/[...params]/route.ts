@@ -5,10 +5,8 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ params: string[] }> }
 ) {
-  // Await the params promise in Next.js 15+
   const resolvedParams = await params;
   
-  // Generate a simple SVG placeholder
   const width = resolvedParams.params[0] || '300';
   const height = resolvedParams.params[1] || '400';
   

@@ -9,35 +9,35 @@ interface NavigationButtonsProps {
 }
 
 export default function NavigationButtons({ className = "", onClose }: NavigationButtonsProps) {
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      onClose?.(); // tutup menu kalau ada
+    }
+  };
+
   return (
     <nav className={className}>
       <Link
-        href="/products"
+        href="/#new-arrival"
+        onClick={(e) => {
+          e.preventDefault();
+          scrollToSection('new-arrival');
+        }}
         className="hover:text-black transition-colors"
-        onClick={onClose}
       >
-        PRODUK
+        NEW LAUNCHING
       </Link>
       <Link
-        href="/categories"
+        href="/#best-seller"
+        onClick={(e) => {
+          e.preventDefault();
+          scrollToSection('best-seller');
+        }}
         className="hover:text-black transition-colors"
-        onClick={onClose}
       >
-        KATEGORI
-      </Link>
-      <Link
-        href="/#about-tautan-rasa"
-        className="hover:text-black transition-colors"
-        onClick={onClose}
-      >
-        TENTANG KAMI
-      </Link>
-      <Link
-        href="/#news"
-        className="hover:text-black transition-colors"
-        onClick={onClose}
-      >
-        BERITA
+        BEST SELLER
       </Link>
     </nav>
   );

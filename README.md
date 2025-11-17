@@ -1,188 +1,36 @@
-# TAUTAN RASA - E-commerce Website
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-Website e-commerce untuk TAUTAN RASA yang menjual perhiasan handmade dengan bunga asli yang diawetkan dalam resin berkualitas tinggi.
+## Getting Started
 
-## 🌸 Tentang TAUTAN RASA
+First, run the development server:
 
-TAUTAN RASA adalah brand perhiasan handmade yang mengabadikan bunga asli. Kami menggunakan bunga asli yang dikombinasikan dengan resin berkualitas tinggi untuk mencegah kekeruhan, serta stainless steel hypoallergenic yang aman untuk kulit.
-
-## 🚀 Fitur Utama
-
-### Frontend (Website Katalog)
-- ✅ **Hero Carousel** - Slider gambar utama dengan auto-slide
-- ✅ **Navigation** - Menu navigasi dengan login/register button
-- ✅ **Company Profile** - Informasi lengkap tentang TAUTAN RASA
-- ✅ **Testimonials** - Review dari customer
-- ✅ **Product Advantages** - Keunggulan produk
-- ✅ **News Gallery** - Galeri berita dan kegiatan
-- ✅ **Shop by Categories** - Kategori produk utama
-- ✅ **Authentication** - Halaman login dan register
-- ✅ **Shopping Cart** - Keranjang belanja dengan calculation
-- ✅ **Checkout** - Halaman pemesanan lengkap
-- ✅ **Products** - Katalog produk (sementara statis)
-
-### Backend (Admin Dashboard)
-- ✅ **Dashboard Overview** - Statistik dan ringkasan
-- ✅ **Categories Management** - CRUD kategori produk
-- ✅ **Products Management** - CRUD produk dengan upload gambar
-- ✅ **Orders Management** - Kelola pesanan customer
-- ✅ **Users Management** - Kelola data pengguna
-- ✅ **Reviews Management** - Moderasi ulasan produk
-
-## 📁 Struktur Database
-
-Database MySQL dengan tabel-tabel berikut:
-
-```sql
-- categories (kategori produk)
-- products (data produk) 
-- users (pengguna & admin)
-- carts & cart_items (keranjang belanja)
-- orders & order_items (pesanan)
-- provinces & cities (data wilayah untuk ongkir)
-- shipping_costs (log ongkir RajaOngkir)
-- payments (pembayaran Midtrans)
-- refunds (refund)
-- reviews (ulasan produk)
-```
-
-## 🛠 Tech Stack
-
-- **Frontend**: Next.js 14, TypeScript, Tailwind CSS
-- **Backend**: Next.js API Routes (akan dibuat)
-- **Database**: MySQL 
-- **Authentication**: NextAuth.js (akan diintegrasikan)
-- **Payment**: Midtrans (akan diintegrasikan) 
-- **Shipping**: RajaOngkir API (akan diintegrasikan)
-- **Image Upload**: Cloudinary atau local storage
-
-## 📦 Installation
-
-1. **Clone repository**
-```bash
-git clone https://github.com/Hamidzuhdi/tautanrasa.git
-cd tautanrasa
-```
-
-2. **Install dependencies**
-```bash
-npm install
-```
-
-3. **Run development server**
 ```bash
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## 🗂 Struktur Folder
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-```
-src/
-├── app/                    # App Router (Next.js 13+)
-│   ├── admin/             # Dashboard admin
-│   │   ├── dashboard/     # Overview admin
-│   │   ├── products/      # Kelola produk
-│   │   ├── categories/    # Kelola kategori  
-│   │   └── layout.tsx     # Layout admin
-│   ├── cart/              # Keranjang belanja
-│   ├── checkout/          # Halaman checkout
-│   ├── login/             # Halaman login
-│   ├── register/          # Halaman register
-│   ├── products/          # Katalog produk
-│   └── page.tsx           # Homepage
-├── components/            # Reusable components
-│   ├── AuthButton.tsx     # Button login/register
-│   ├── CartButton.tsx     # Button keranjang
-│   ├── NavigationButtons.tsx
-│   ├── MobileMenu.tsx
-│   └── SearchInput.tsx
-└── public/
-    ├── img/               # Gambar statis website
-    └── uploads/           # Upload gambar produk
-        └── products/      # Gambar produk dari admin
-```
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## 🎯 Roadmap (Next Steps)
+## Learn More
 
-### Phase 1: Database Integration
-- [ ] Setup Prisma ORM atau MySQL2
-- [ ] Create API routes untuk CRUD operations
-- [ ] Integrasi authentication dengan NextAuth.js
-- [ ] Connect halaman admin dengan database
-- [ ] Dynamic product listing dari database
+To learn more about Next.js, take a look at the following resources:
 
-### Phase 2: E-commerce Features  
-- [ ] Shopping cart dengan state management (Zustand/Redux)
-- [ ] Checkout flow dengan RajaOngkir API
-- [ ] Payment integration dengan Midtrans
-- [ ] Order management system
-- [ ] Email notifications
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-## 📱 Pages & Routes
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-### Public Routes
-- `/` - Homepage dengan hero, about, testimonials
-- `/products` - Katalog produk dengan filter & search
-- `/cart` - Keranjang belanja
-- `/checkout` - Halaman checkout
-- `/login` - Halaman login
-- `/register` - Halaman register
+## Deploy on Vercel
 
-### Admin Routes (Protected)
-- `/admin/dashboard` - Overview statistik
-- `/admin/products` - Kelola produk
-- `/admin/categories` - Kelola kategori
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-## 🔧 Development Notes
-
-### Saat Ini (Status: Katalog Statis)
-- Website sudah berjalan sebagai katalog statis
-- Admin dashboard UI sudah ready
-- Cart & checkout flow sudah ready
-- **Belum ada**: Database connection, API routes, authentication
-
-### ✅ **COMPLETED - Database & Authentication Ready!**
-
-**Database Connection:** ✅ MySQL with Prisma ORM  
-**Authentication:** ✅ NextAuth.js dengan role-based access  
-**API Routes:** ✅ CRUD endpoints untuk categories, products, auth  
-**Admin Dashboard:** ✅ Siap untuk testing CRUD operations  
-**Sample Data:** ✅ Admin user dan produk contoh tersedia  
-
-### 🧪 **Testing Guide**
-
-**1. Login Admin:**
-- Buka `http://localhost:3000/login`
-- Email: `admin@tautanrasa.com`
-- Password: `admin123`
-
-**2. Test Admin Dashboard:**
-- Setelah login, click dropdown user > "Dashboard Admin"
-- Atau langsung ke `http://localhost:3000/admin/dashboard`
-- Test CRUD products di `/admin/products`
-- Test CRUD categories di `/admin/categories`
-
-**3. Database Setup Required:**
-```bash
-# Update DATABASE_URL di .env sesuai MySQL Anda:
-DATABASE_URL="mysql://username:password@localhost:3306/tautanrasa"
-
-# Jalankan database migration:
-npx prisma db push
-
-# Seed data (admin user + sample products):
-npx tsx scripts/seed.ts
-```
-
-### 🔄 **Next Development Phase:**
-1. **File Upload** - Image upload untuk produk di admin
-2. **Frontend Integration** - Connect UI dengan API endpoints  
-3. **Cart State Management** - Real shopping cart functionality
-4. **Payment Integration** - Midtrans untuk pembayaran
-5. **Order Management** - Complete order flow
-
----
-
-**TAUTAN RASA** - Where Every Flowers Tell a Story 🌸
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

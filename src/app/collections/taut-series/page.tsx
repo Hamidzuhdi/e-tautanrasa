@@ -4,8 +4,44 @@ import Link from 'next/link';
 import SearchInput from '@/components/SearchInput';
 
 export default function TautSeriesPage() {
-  // Products will be loaded from database
-  const products: any[] = [];
+  // TAUT SERIES products from your data
+  const products = [
+    {
+      name: "Tautan Rasa - Ammi Pink Ace",
+      price: "Rp170.000",
+      colors: "Available in multiple colors",
+      href: "https://id.shp.ee/YJ8wZXg",
+      image: "Tautan Rasa-Ammi Pink Ace.png"
+    },
+    {
+      name: "Tautan Rasa - Fleur Forever",
+      price: "Rp190.000", 
+      colors: "Available in multiple colors",
+      href: "https://id.shp.ee/Pg7xFeo",
+      image: "Tautan Rasa-Fleur Forever.png"
+    },
+    {
+      name: "Tautan Rasa - Mariposa Dream",
+      price: "Rp190.000",
+      colors: "Available in multiple colors",
+      href: "https://shopee.co.id/product/1498500791/42220245010?d_id=9f44f",
+      image: "Tautan Rasa-Mariposa Dream.png"
+    },
+    {
+      name: "Tautan Rasa - Blue Plum Blossom",
+      price: "Rp115.000",
+      colors: "Available in multiple colors",
+      href: "https://id.shp.ee/bpFvcZS",
+      image: "Tautan Rasa-Blue Plum Blossom.png"
+    },
+    {
+      name: "Tautan Rasa - Elyra Classic Chain",
+      price: "Rp197.000",
+      colors: "Available in multiple colors",
+      href: "https://id.shp.ee/x2yUtC7",
+      image: "Tautan Rasa-Elyra Classic Chain.png"
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-white font-sans">
@@ -69,13 +105,35 @@ export default function TautSeriesPage() {
         </div>
       </section>
 
-      {/* Products Grid - Will be loaded from database */}
+      {/* Products Grid */}
       <section className="py-8 md:py-12 px-4 md:px-6 bg-gray-50">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center">
-            <p className="text-lg text-gray-600 mb-8">
-              Produk Taut Series akan ditampilkan di sini setelah koneksi database
-            </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6">
+            {products.map((product, index) => (
+              <Link key={index} href={product.href} className="group block product-card">
+                <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                  <div className="aspect-[3/4] relative overflow-hidden">
+                    <Image
+                      src={`/img/${product.image}`}
+                      alt={product.name}
+                      width={300}
+                      height={400}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <div className="p-3 md:p-4">
+                    <h3 
+                      className="text-sm md:text-base font-medium mb-2 text-gray-900 line-clamp-2" 
+                      data-product-name={product.name}
+                    >
+                      {product.name}
+                    </h3>
+                    <p className="text-lg md:text-xl font-bold text-red-600 mb-1">{product.price}</p>
+                    <p className="text-xs md:text-sm text-gray-500">{product.colors}</p>
+                  </div>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
