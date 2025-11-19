@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Toaster } from 'react-hot-toast';
 import { usePathname } from 'next/navigation';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -85,6 +86,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </svg>
             <span className="font-medium">User Management</span>
           </Link>
+          <Link
+            href="/admin/categories"
+            onClick={() => setIsSidebarOpen(false)}
+            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 ${
+              isActive('/admin/categories')
+                ? 'bg-gradient-to-r from-rose-500 to-purple-600 text-white shadow-lg'
+                : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+            }`}
+          >
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
+            </svg>
+            <span className="font-medium">Kategori Produk</span>
+          </Link>
         </nav>
 
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-700">
@@ -110,6 +125,33 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <main className={`transition-all duration-300 pt-16 lg:pt-0`}>
         {children}
       </main>
+      {/* === Tambahkan ini di sini === */}
+    <Toaster
+      position="top-right"
+      reverseOrder={false}
+      gutter={8}
+      toastOptions={{
+        duration: 4000,
+        style: {
+          background: '#363636',
+          color: '#fff',
+          fontSize: '14px',
+        },
+        success: {
+          iconTheme: {
+            primary: '#10b981',
+            secondary: '#fff',
+          },
+        },
+        error: {
+          iconTheme: {
+            primary: '#ef4444',
+            secondary: '#fff',
+          },
+        },
+      }}
+    />
+    {/* === selesai === */}
     </div>
   );
 }

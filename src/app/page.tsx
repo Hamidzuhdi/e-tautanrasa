@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import SearchInput from '@/components/SearchInput';
 import NavigationButtons from '@/components/NavigationButtons';
 import MobileMenu from '@/components/MobileMenu';
+import UserDropdown from '@/components/UserDropdown';
 
 // Hero Carousel Component
 function HeroCarousel() {
@@ -115,6 +116,7 @@ export default function HomePage() {
             <div className="flex items-center space-x-4">
               <span className="text-sm font-medium text-gray-700 hidden sm:block">IDR Rp <span className="font-bold">▽</span></span>
               <SearchInput className="flex" />
+              <UserDropdown />
             </div>
           </div>
 
@@ -124,7 +126,10 @@ export default function HomePage() {
               <div className="text-xl font-bold text-black tracking-wide">
                 TAUTAN RASA
               </div>
-              <MobileMenu />
+              <div className="flex items-center space-x-2">
+                <UserDropdown />
+                <MobileMenu />
+              </div>
             </div>
             {/* Mobile Search */}
             <SearchInput className="w-full" />

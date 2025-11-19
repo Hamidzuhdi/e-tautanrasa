@@ -48,6 +48,7 @@ export async function POST(request: NextRequest) {
           email: user.email,
           role: user.role,
         },
+        role: user.role, // Untuk backward compatibility
       },
       { status: 200 }
     );
