@@ -7,12 +7,15 @@ import Modal from '@/components/admin/Modal';
 
 interface User {
   id: string;
-  name: string;
-  email: string;
+  nama: string;      // FIX
+  email: string | null;
+  noHp: string;      // FIX
+  alamat: string | null;
   role: string;
   createdAt: string;
   updatedAt: string;
 }
+
 
 export default function UsersManagementPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -47,7 +50,7 @@ export default function UsersManagementPage() {
     fetchUsers();
   }, []);
 
-  const handleSaveUser = async (formData: { name: string; email: string; password?: string }) => {
+  const handleSaveUser = async (formData: { name: string; email: string; password?: string; noHp?: string }) => {
     try {
       setIsFormLoading(true);
       setErrorMessage('');
@@ -131,8 +134,8 @@ export default function UsersManagementPage() {
 
   const filteredUsers = users.filter(
     (user) =>
-      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase())
+      user.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (user.email && user.email.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   return (
@@ -234,7 +237,7 @@ export default function UsersManagementPage() {
                   {filteredUsers.map((user) => (
                     <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 text-sm text-gray-900 font-medium">
-                        {user.name}
+                        {user.nama}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600">
                         {user.email}
@@ -288,7 +291,11 @@ export default function UsersManagementPage() {
         }}
       >
         <UserForm
-          user={editingUser}
+          user={
+            editingUser
+              ? { id: editingUser.id, name: editingUser.nama, email: editingUser.email ?? '', noHp: editingUser.noHp ?? '' }
+              : null
+          }
           onSubmit={handleSaveUser}
           onCancel={() => {
             setIsModalOpen(false);
@@ -311,7 +318,7 @@ export default function UsersManagementPage() {
             </div>
 
             <p className="text-gray-600 mb-2">
-              Apakah Anda yakin ingin menghapus user <strong>{userToDelete.name}</strong>?
+              Apakah Anda yakin ingin menghapus user <strong>{userToDelete.nama}</strong>?
             </p>
             <p className="text-sm text-gray-500 mb-6">
               ({userToDelete.email})

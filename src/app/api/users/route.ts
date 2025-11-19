@@ -4,11 +4,11 @@ import { hashPassword } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, password } = await request.json();
+    const { name, email, password, noHp } = await request.json();
 
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !noHp) {
       return NextResponse.json(
-        { error: 'Nama, email, dan password harus diisi' },
+        { error: 'Nama, email, noHp, dan password harus diisi' },
         { status: 400 }
       );
     }
@@ -28,10 +28,11 @@ export async function POST(request: NextRequest) {
 
     const user = await prisma.user.create({
       data: {
-        name,
+        nama: name,
         email,
         password: hashedPassword,
-        role: 'admin',
+        role: 'ADMIN',
+        noHp,
       },
     });
 
@@ -39,8 +40,8 @@ export async function POST(request: NextRequest) {
       {
         message: 'User berhasil dibuat',
         user: {
-          id: user.id,
-          name: user.name,
+          id: user.id.toString(),
+          nama: user.nama,
           email: user.email,
           role: user.role,
           createdAt: user.createdAt,
@@ -63,8 +64,10 @@ export async function GET(request: NextRequest) {
     const users = await prisma.user.findMany({
       select: {
         id: true,
-        name: true,
+        nama: true,
         email: true,
+        noHp: true,
+        alamat: true,
         role: true,
         createdAt: true,
         updatedAt: true,
@@ -74,11 +77,16 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    const safeUsers = users.map((u) => ({
+      ...u,
+      id: u.id.toString(),
+    }));
+
     return NextResponse.json(
       {
         message: 'Data user berhasil diambil',
-        users,
-        total: users.length,
+        users: safeUsers,
+        total: safeUsers.length,
       },
       { status: 200 }
     );

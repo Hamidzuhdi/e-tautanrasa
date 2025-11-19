@@ -7,8 +7,9 @@ interface UserFormProps {
     id: string;
     name: string;
     email: string;
+    noHp: string;
   } | null;
-  onSubmit: (data: { name: string; email: string; password?: string }) => Promise<void>;
+  onSubmit: (data: { name: string; email: string; password?: string; noHp?: string }) => Promise<void>;
   onCancel: () => void;
   isLoading: boolean;
 }
@@ -19,6 +20,7 @@ export default function UserForm({ user, onSubmit, onCancel, isLoading }: UserFo
     email: user?.email || '',
     password: '',
     confirmPassword: '',
+    noHp: user?.noHp || '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -29,6 +31,7 @@ export default function UserForm({ user, onSubmit, onCancel, isLoading }: UserFo
         email: user.email,
         password: '',
         confirmPassword: '',
+        noHp: user.noHp,
       });
     }
   }, [user]);
@@ -70,6 +73,7 @@ export default function UserForm({ user, onSubmit, onCancel, isLoading }: UserFo
     const submitData: any = {
       name: formData.name,
       email: formData.email,
+      noHp: formData.noHp,
     };
 
     if (formData.password) {
@@ -129,6 +133,22 @@ export default function UserForm({ user, onSubmit, onCancel, isLoading }: UserFo
         />
         {errors.password && (
           <p className="text-red-600 text-sm mt-1">{errors.password}</p>
+        )}
+      </div>
+      <div>
+        <label htmlFor="noHp" className="block text-sm font-semibold text-gray-700 mb-2">
+          noHp
+        </label>
+        <input
+          type="noHp"
+          id="noHp"
+          value={formData.noHp}
+          onChange={(e) => setFormData({ ...formData, noHp: e.target.value })}
+          placeholder="Masukkan noHp"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all"
+        />
+        {errors.noHp && (
+          <p className="text-red-600 text-sm mt-1">{errors.noHp}</p>
         )}
       </div>
 

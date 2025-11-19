@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       where: { email },
     });
 
-    if (!user) {
+    if (!user || !user.password) {
       return NextResponse.json(
         { error: 'Email atau password salah' },
         { status: 401 }
@@ -34,8 +34,8 @@ export async function POST(request: NextRequest) {
     }
 
     const token = generateToken({
-      id: user.id,
-      email: user.email,
+      id: user.id.toString(),     // FIX BigInt → string
+      email: user.email ?? "",    // FIX nullable
       role: user.role,
     });
 
@@ -43,8 +43,8 @@ export async function POST(request: NextRequest) {
       {
         message: 'Login berhasil',
         user: {
-          id: user.id,
-          name: user.name,
+          id: user.id.toString(),
+          nama: user.nama,
           email: user.email,
           role: user.role,
         },
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 60 * 60 * 24, // 24 jam
+      maxAge: 60 * 60 * 24,
       path: '/',
     });
 
@@ -68,5 +68,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-
 }

@@ -388,7 +388,7 @@ export default function HomePage() {
             New Launching - Drawstring Collection
           </h2>
           {/* Grid optimized for many items in the video */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 md:gap-4 justify-items-center">
+          {/* <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 md:gap-4 justify-items-center">
             {[
               'Pinkies Bumb', 'Moonlit Silvermist', 'Couple Black Light', 'Bloom Stripe Clamp (White Bone)', 'Bloom Stripe Clamp (Maroon)', 'Bloom Stripe Clamp (Milo)', 'Bloom Stripe (Navy)', 
               'Bloom Stripe (Mauve)', 'Bloom Stripe (Brown)'
@@ -442,7 +442,7 @@ export default function HomePage() {
                 </Link>
               );
             })}
-          </div>
+          </div> */}
         </div>
       </section>
 
@@ -452,7 +452,7 @@ export default function HomePage() {
     <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 md:mb-10 text-gray-900">
       Charm Series
     </h2>
-    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 md:gap-4 justify-items-center">
+    {/* <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 md:gap-4 justify-items-center">
       {[
         'Ballerina Grace',
         'Ocean Bloom',
@@ -484,7 +484,7 @@ export default function HomePage() {
           </Link>
         );
       })}
-    </div>
+    </div> */}
   </div>
 </section>
 
@@ -622,7 +622,7 @@ export default function HomePage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {/* Produk 1: Bloom Stripe Mauve */}
             <Link href="https://id.shp.ee/Dq7dLdo" className="group block product-card">
-              <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
+              {/* <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
                 <div className="aspect-[3/4] relative overflow-hidden">
                   <a href="https://id.shp.ee/Dq7dLdo">
                     <Image
@@ -641,12 +641,12 @@ export default function HomePage() {
                   <p className="text-lg md:text-xl font-bold text-red-600">Rp140.000</p>
                   <p className="text-xs md:text-sm text-gray-500 line-clamp-1">Rope in Mauve</p>
                 </div>
-              </div>
+              </div> */}
             </Link>
 
             {/* Produk 2: Bloom Stripe Calm */}
             <Link href="https://id.shp.ee/wK1NgyB" className="group block">
-              <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
+              {/* <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
                 <div className="aspect-[3/4] relative overflow-hidden">
                   <a href="https://id.shp.ee/wK1NgyB">
                     <Image
@@ -665,12 +665,12 @@ export default function HomePage() {
                   <p className="text-lg md:text-xl font-bold text-red-600">Rp165.000</p>
                   <p className="text-xs md:text-sm text-gray-500 line-clamp-1">New Clamp Charm</p>
                 </div>
-              </div>
+              </div> */}
             </Link>
 
             {/* Produk 3: Mariposa Dream */}
             <Link href="https://shopee.co.id/product/1498500791/42220245010?d_id=9f44f" className="group block">
-              <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
+              {/* <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
                 <div className="aspect-[3/4] relative overflow-hidden">
                   <a href="https://shopee.co.id/product/1498500791/42220245010?d_id=9f44f">
                     <Image
@@ -689,12 +689,12 @@ export default function HomePage() {
                   <p className="text-lg md:text-xl font-bold text-red-600">Rp190.000</p>
                   <p className="text-xs md:text-sm text-gray-500 line-clamp-1">Feminim, Charm, Classy</p>
                 </div>
-              </div>
+              </div> */}
             </Link>
 
             {/* Produk 4: Elyra Classic Chain */}
             <Link href="https://id.shp.ee/x2yUtC7" className="group block">
-              <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
+              {/* <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
                 <div className="aspect-[3/4] relative overflow-hidden">
                   <a href="https://id.shp.ee/x2yUtC7">
                     <Image
@@ -713,7 +713,7 @@ export default function HomePage() {
                   <p className="text-lg md:text-xl font-bold text-red-600">Rp197.000</p>
                   <p className="text-xs md:text-sm text-gray-500 line-clamp-1">support 4 charm feeling blue</p>
                 </div>
-              </div>
+              </div> */}
             </Link>
           </div>
         </div>
@@ -787,7 +787,7 @@ export default function HomePage() {
           </h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {/* 1. Ammi Pink Ace */}
-        <Link href="https://id.shp.ee/YJ8wZXg" className="group block">
+        {/* <Link href="https://id.shp.ee/YJ8wZXg" className="group block">
           <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
             <div className="aspect-[3/4] relative overflow-hidden">
           <a href="https://id.shp.ee/YJ8wZXg">
@@ -807,10 +807,10 @@ export default function HomePage() {
           <p className="text-lg md:text-xl font-bold text-red-600">Rp170.000</p>
             </div>
           </div>
-        </Link>
+        </Link> */}
 
         {/* 2. Fleur Forever */}
-        <Link href="https://id.shp.ee/Pg7xFeo" className="group block">
+        {/* <Link href="https://id.shp.ee/Pg7xFeo" className="group block">
           <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
             <div className="aspect-[3/4] relative overflow-hidden">
           <a href="https://id.shp.ee/Pg7xFeo">
@@ -830,10 +830,10 @@ export default function HomePage() {
           <p className="text-lg md:text-xl font-bold text-red-600">Rp190.000</p>
             </div>
           </div>
-        </Link>
+        </Link> */}
 
         {/* 3. Mariposa Dream */}
-        <Link href="https://shopee.co.id/product/1498500791/42220245010?d_id=9f44f" className="group block">
+        {/* <Link href="https://shopee.co.id/product/1498500791/42220245010?d_id=9f44f" className="group block">
           <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
             <div className="aspect-[3/4] relative overflow-hidden">
           <a href="https://shopee.co.id/product/1498500791/42220245010?d_id=9f44f">
@@ -853,10 +853,10 @@ export default function HomePage() {
           <p className="text-lg md:text-xl font-bold text-red-600">Rp. 190.000</p>
             </div>
           </div>
-        </Link>
+        </Link> */}
         
         {/* 4. Blue Plum Blossom */}
-        <Link href="https://id.shp.ee/bpFvcZS" className="group block">
+        {/* <Link href="https://id.shp.ee/bpFvcZS" className="group block">
           <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
             <div className="aspect-[3/4] relative overflow-hidden">
           <a href="https://id.shp.ee/bpFvcZS">
@@ -876,9 +876,9 @@ export default function HomePage() {
           <p className="text-lg md:text-xl font-bold text-red-600">Rp115.000</p>
             </div>
           </div>
-        </Link>
+        </Link> */}
         { /* 5. Elyra Classic Chain */}
-        <Link href="https://id.shp.ee/x2yUtC7" className="group block">
+        {/* <Link href="https://id.shp.ee/x2yUtC7" className="group block">
           <div className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
             <div className="aspect-[3/4] relative overflow-hidden">
           <a href="https://id.shp.ee/x2yUtC7">
@@ -898,7 +898,7 @@ export default function HomePage() {
           <p className="text-lg md:text-xl font-bold text-red-600">Rp197.000</p>
             </div>
           </div>
-        </Link>
+        </Link> */}
           </div>
         </div>
       </section>

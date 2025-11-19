@@ -2,6 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { hashPassword } from '@/lib/auth';
 
+// Function untuk convert BigInt di object
+function serializeBigInt(obj: any) {
+  return JSON.parse(
+    JSON.stringify(obj, (_, value) =>
+      typeof value === 'bigint' ? value.toString() : value
+    )
+  );
+}
+
 // GET: Get user by ID
 export async function GET(
   request: NextRequest,
@@ -11,11 +20,13 @@ export async function GET(
     const { id } = params;
 
     const user = await prisma.user.findUnique({
-      where: { id },
+      where: { id: BigInt(id) },
       select: {
         id: true,
-        name: true,
+        nama: true,
         email: true,
+        noHp: true,
+        alamat: true,
         role: true,
         createdAt: true,
         updatedAt: true,
@@ -32,7 +43,7 @@ export async function GET(
     return NextResponse.json(
       {
         message: 'Data user berhasil diambil',
-        user,
+        user: serializeBigInt(user),
       },
       { status: 200 }
     );
@@ -45,78 +56,69 @@ export async function GET(
   }
 }
 
-// PUT: Update user by ID
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { id } = params;
-    const { name, email, password } = await request.json();
 
-    // Check if user exists
+    const body = await request.json();
+    console.log("BODY RECEIVED:", body); // <--- DEBUG
+
+    const { name, email, password, nohp } = body;
+
     const user = await prisma.user.findUnique({
-      where: { id },
+      where: { id: BigInt(id) },
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'User tidak ditemukan' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'User tidak ditemukan' }, { status: 404 });
     }
 
-    // Validasi email unik jika email berubah
+    // Cek email unik
     if (email && email !== user.email) {
-      const existingUser = await prisma.user.findUnique({
-        where: { email },
-      });
-
+      const existingUser = await prisma.user.findUnique({ where: { email } });
       if (existingUser) {
-        return NextResponse.json(
-          { error: 'Email sudah terdaftar' },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: 'Email sudah terdaftar' }, { status: 400 });
       }
     }
 
-    // Prepare update data
     const updateData: any = {};
-    if (name) updateData.name = name;
+
+    if (name) updateData.nama = name;
     if (email) updateData.email = email;
-    if (password) {
+    if (nohp) updateData.noHp = nohp;
+
+    if (password && password.trim() !== "") {
       updateData.password = await hashPassword(password);
     }
 
-    // Update user
+    console.log("UPDATEDATA:", updateData); // <--- DEBUG
+
     const updatedUser = await prisma.user.update({
-      where: { id },
+      where: { id: BigInt(id) },
       data: updateData,
       select: {
         id: true,
-        name: true,
+        nama: true,
         email: true,
+        noHp: true,
+        alamat: true,
         role: true,
         createdAt: true,
         updatedAt: true,
       },
     });
 
-    return NextResponse.json(
-      {
-        message: 'User berhasil diupdate',
-        user: updatedUser,
-      },
-      { status: 200 }
-    );
+    return NextResponse.json({
+      message: "User berhasil diupdate",
+      user: serializeBigInt(updatedUser),
+    });
+
   } catch (error) {
-    console.error('Update user error:', error);
-    return NextResponse.json(
-      { error: 'Terjadi kesalahan pada server' },
-      { status: 500 }
-    );
+    console.error("Update user error:", error);
+    return NextResponse.json({ error: "Terjadi kesalahan pada server" }, { status: 500 });
   }
 }
+
 
 // DELETE: Delete user by ID
 export async function DELETE(
@@ -126,9 +128,8 @@ export async function DELETE(
   try {
     const { id } = params;
 
-    // Check if user exists
     const user = await prisma.user.findUnique({
-      where: { id },
+      where: { id: BigInt(id) },
     });
 
     if (!user) {
@@ -138,9 +139,8 @@ export async function DELETE(
       );
     }
 
-    // Delete user
     await prisma.user.delete({
-      where: { id },
+      where: { id: BigInt(id) },
     });
 
     return NextResponse.json(

@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,13 +7,268 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String     @id @default(cuid())
-  name      String
-  email     String     @unique
-  password  String
-  role      String     @default("admin")
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+// 1. Category
+model Category {
+  id        Int       @id @default(autoincrement())
+  nama      String    @db.VarChar(100)
+  slug      String?   @unique @db.VarChar(100)
+  icon      String?   @db.VarChar(255)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  products  Product[]
+
+  @@map("categories")
 }
 
+// 2. Product
+model Product {
+  id           BigInt    @id @default(autoincrement())
+  kategoriId   Int?      @map("kategori_id")
+  nama         String    @db.VarChar(200)
+  slug         String    @unique @db.VarChar(200)
+  deskripsi    String?   @db.Text
+  harga        Decimal   @db.Decimal(12, 2)
+  stok         Int       @default(0)
+  beratGram    Int       @default(0) @map("berat_gram")
+  foto1        String?   @db.VarChar(255)
+  foto2        String?   @db.VarChar(255)
+  isActive     Boolean   @default(true) @map("is_active")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  kategori     Category?  @relation(fields: [kategoriId], references: [id], onDelete: SetNull)
+  cartItems    CartItem[]
+  orderItems   OrderItem[]
+  reviews      Review[]
+
+  @@index([slug])
+  @@index([isActive])
+  @@index([kategoriId])
+  @@map("products")
+}
+
+// 3. User
+model User {
+  id        BigInt    @id @default(autoincrement())
+  nama      String    @db.VarChar(100)
+  email     String?   @unique @db.VarChar(100)
+  noHp      String    @map("no_hp") @db.VarChar(20)
+  password  String?   @db.VarChar(255)
+  alamat    String?   @db.Text
+  role      Role      @default(CUSTOMER)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  carts     Cart[]
+  orders    Order[]
+  reviews   Review[]
+
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  CUSTOMER
+}
+
+// 4. Cart & CartItem
+model Cart {
+  id        BigInt    @id @default(autoincrement())
+  userId    BigInt?   @map("user_id")
+  sessionId String?   @map("session_id") @db.VarChar(100)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+
+  @@index([sessionId])
+  @@index([userId])
+  @@map("carts")
+}
+
+model CartItem {
+  id           BigInt  @id @default(autoincrement())
+  cartId       BigInt  @map("cart_id")
+  productId    BigInt  @map("product_id")
+  qty          Int     @default(1)
+  hargaSaatIni Decimal @map("harga_saat_ini") @db.Decimal(12, 2)
+
+  cart         Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product      Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("cart_items")
+}
+
+// 5. Province & City
+model Province {
+  id     String  @id @db.Char(2)
+  name   String  @db.VarChar(50)
+
+  cities City[]
+  orders Order[]
+
+  @@map("provinces")
+}
+
+model City {
+  id          Int      @id
+  provinceId  String   @map("province_id") @db.Char(2)
+  name        String   @db.VarChar(100)
+  postalCode  String?  @map("postal_code") @db.VarChar(10)
+
+  province    Province @relation(fields: [provinceId], references: [id])
+  orders      Order[]
+
+  @@map("cities")
+}
+
+// 6. Order
+model Order {
+  id                BigInt        @id @default(autoincrement())
+  invoice           String        @unique @db.VarChar(20)
+  userId            BigInt?       @map("user_id")
+  totalItem         Int           @map("total_item")
+  totalHarga        Decimal       @map("total_harga") @db.Decimal(12, 2)
+  ongkir            Decimal       @default(0) @db.Decimal(12, 2)
+  kurir             String?       @db.VarChar(10)
+  service           String?       @db.VarChar(50)
+  etd               String?       @db.VarChar(20)
+  alamatKirim       String        @map("alamat_kirim") @db.Text
+  recipientName     String        @map("recipient_name") @db.VarChar(100)
+  recipientPhone    String        @map("recipient_phone") @db.VarChar(20)
+  provinceId        String?       @map("province_id") @db.Char(2)
+  cityId            Int?          @map("city_id")
+  postalCode        String?       @map("postal_code") @db.VarChar(10)
+  status            OrderStatus   @default(PENDING)
+  snapToken         String?       @map("snap_token") @db.VarChar(50)
+  paidAt            DateTime?     @map("paid_at")
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+
+  user              User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  province          Province?     @relation(fields: [provinceId], references: [id])
+  city              City?         @relation(fields: [cityId], references: [id])
+
+  items             OrderItem[]
+  payment           Payment?
+  shippingCost      ShippingCost?
+  refunds           Refund[]
+  reviews           Review[]
+
+  @@index([invoice])
+  @@index([userId])
+  @@index([status])
+  @@map("orders")
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PACKED
+  SHIPPED
+  DONE
+  CANCELED
+}
+
+// 7. OrderItem
+model OrderItem {
+  id        BigInt  @id @default(autoincrement())
+  orderId   BigInt  @map("order_id")
+  productId BigInt  @map("product_id")
+  qty       Int
+  harga     Decimal @db.Decimal(12, 2)
+
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("order_items")
+}
+
+// 8. ShippingCost (1-to-1)
+model ShippingCost {
+  id                BigInt   @id @default(autoincrement())
+  orderId           BigInt   @unique @map("order_id")
+  originCityId      Int      @map("origin_city_id")
+  destinationCityId Int      @map("destination_city_id")
+  weight            Int
+  courier           String   @db.VarChar(10)
+  service           String   @db.VarChar(50)
+  cost              Decimal  @db.Decimal(12, 2)
+  etd               String   @db.VarChar(20)
+  responseJson      Json     @map("response_json")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  order             Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("shipping_costs")
+}
+
+// 9. Payment (1-to-1)
+model Payment {
+  id                BigInt   @id @default(autoincrement())
+  orderId           BigInt   @unique @map("order_id")
+  midtransOrderId   String?  @map("midtrans_order_id") @db.VarChar(50)
+  grossAmount       Decimal? @map("gross_amount") @db.Decimal(12, 2)
+  paymentType       String?  @map("payment_type") @db.VarChar(20)
+  transactionId     String?  @map("transaction_id") @db.VarChar(50)
+  transactionStatus String?  @map("transaction_status") @db.VarChar(20)
+  fraudStatus       String?  @map("fraud_status") @db.VarChar(20)
+  snapToken         String?  @map("snap_token") @db.VarChar(50)
+  vaNumber          String?  @map("va_number") @db.VarChar(30)
+  billKey           String?  @map("bill_key") @db.VarChar(50)
+  billerCode        String?  @map("biller_code") @db.VarChar(20)
+  expiryTime        DateTime? @map("expiry_time")
+  pdfUrl            String?   @map("pdf_url") @db.VarChar(255)
+  finishRedirectUrl String?   @map("finish_redirect_url") @db.Text
+  rawJson           Json      @map("raw_json")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  order             Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([transactionId])
+  @@index([transactionStatus])
+  @@map("payments")
+}
+
+// 10. Refund
+model Refund {
+  id          BigInt       @id @default(autoincrement())
+  orderId     BigInt       @map("order_id")
+  amount      Decimal      @db.Decimal(12, 2)
+  reason      String?      @db.Text
+  status      RefundStatus @default(REQUESTED)
+  processedAt DateTime?    @map("processed_at")
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  order       Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("refunds")
+}
+
+enum RefundStatus {
+  REQUESTED
+  PROCESSED
+  DONE
+}
+
+// 11. Review
+model Review {
+  id          BigInt   @id @default(autoincrement())
+  productId   BigInt   @map("product_id")
+  userId      BigInt?  @map("user_id")
+  orderId     BigInt?  @map("order_id")   // <-- diubah jadi nullable
+  rating      Int
+  review      String?  @db.Text
+  isApproved  Boolean  @default(false) @map("is_approved")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  order       Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull) // <-- order juga nullable
+
+  @@unique([orderId, productId])
+  @@map("reviews")
+}
