@@ -39,19 +39,10 @@ export default function CategoriesPage() {
     fetchCategories();
   }, []);
 
-  // Generate slug otomatis
-  const generateSlug = (nama: string) => {
-    return nama
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-');
-  };
-
-  const handleNamaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const nama = e.target.value;
-    setForm({ ...form, nama, slug: generateSlug(nama) });
+  // Handle form input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
   };
 
   // Buka modal untuk tambah baru
@@ -216,39 +207,47 @@ export default function CategoriesPage() {
               </div>
 
               <form onSubmit={handleSubmit} className="p-6 space-y-5">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Nama Kategori</label>
-                  <input
-                    type="text"
-                    value={form.nama}
-                    onChange={handleNamaChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-                    placeholder="Contoh: Makanan Ringan"
-                    required
-                    autoFocus
-                  />
+                {/* Nama dan Icon dalam grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Nama Kategori *</label>
+                    <input
+                      type="text"
+                      name="nama"
+                      value={form.nama}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                      placeholder="Contoh: Makanan Ringan"
+                      required
+                      autoFocus
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Icon (emoji)</label>
+                    <input
+                      type="text"
+                      name="icon"
+                      value={form.icon}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                      placeholder="🍔"
+                    />
+                  </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Slug (otomatis)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Slug (URL) *</label>
                   <input
                     type="text"
+                    name="slug"
                     value={form.slug}
-                    onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50"
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
                     placeholder="makanan-ringan"
+                    required
                   />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Icon (emoji / URL)</label>
-                  <input
-                    type="text"
-                    value={form.icon}
-                    onChange={(e) => setForm({ ...form, icon: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg"
-                    placeholder="🍔 atau https://..."
-                  />
+                  <p className="text-xs text-gray-500 mt-1">Gunakan format: huruf kecil, strip (-) untuk spasi. Contoh: makanan-ringan</p>
                 </div>
 
                 <div className="flex justify-end gap-3 pt-4">

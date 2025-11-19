@@ -35,7 +35,7 @@ export default function LoginPage() {
 
       // Login sukses → arahkan sesuai role
       if (data.user.role === 'ADMIN') {
-        router.push('/admin/dashboard');
+        router.push('/admin');
       } else if (data.user.role === 'CUSTOMER') {
         router.push('/'); // Redirect CUSTOMER ke homepage
       }

@@ -97,8 +97,37 @@ function HeroCarousel() {
   );
 }
 
+interface Category {
+  id: number;
+  nama: string;
+  slug: string | null;
+  icon: string | null;
+}
+
 export default function HomePage() {
   const [selectedNews, setSelectedNews] = useState<null | 'collection' | 'collaboration' | 'workshop' | 'gallery'>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/categories');
+        if (response.ok) {
+          const data = await response.json();
+          setCategories(data);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
   return (
     <div className="min-h-screen bg-white font-sans">
       {/* Header / Navbar (Top Navigation) */}
@@ -737,50 +766,61 @@ export default function HomePage() {
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 md:mb-10 text-gray-900">
             Shop by Categories
           </h2>
-          {/* 3 Main Categories - Larger Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-            {[
-              { name: 'CHARM SERIES', href: '/collections/charm-series', description: 'Koleksi elegan dengan sentuhan mempesona' },
-              { name: 'TAUT SERIES', href: '/collections/taut-series', description: 'Rangkaian fashion yang terhubung harmonis' },
-              { name: 'DRAWSTRING COLLECTION', href: '/collections/drawstring-collection', description: 'Kenyamanan bertemu dengan gaya modern' }
-            ].map((category) => (
-              <Link 
-                key={category.name} 
-                href={category.href} 
-                className="group block overflow-hidden rounded-xl relative hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
-              >
-                <div className="aspect-[4/5] relative">
-                  <a href={category.href}>
+          
+          {categoriesLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="aspect-[4/5] bg-gray-200 rounded-xl animate-pulse"></div>
+              ))}
+            </div>
+          ) : categories.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+              {categories.map((category) => (
+                <Link 
+                  key={category.id} 
+                  href={category.slug ? `/collections/${category.slug}` : '#'} 
+                  className="group block overflow-hidden rounded-xl relative hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
+                >
+                  <div className="aspect-[4/5] relative">
                     <Image
-                      src={`/img/LOGO BRAND TAUTAN RASA.jpg?text=${category.name.replace(' ', '%20')}`}
-                      alt={category.name}
+                      src={`/img/LOGO BRAND TAUTAN RASA.jpg?text=${category.nama.replace(' ', '%20')}`}
+                      alt={category.nama}
                       width={600}
                       height={750}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
-                  </a>
-                  {/* Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 transition-all duration-500" />
-                  
-                  {/* Content */}
-                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                    <h3 className="text-2xl md:text-3xl font-bold mb-2 tracking-wide group-hover:text-yellow-400 transition-colors duration-300">
-                      {category.name}
-                    </h3>
-                    <p className="text-sm md:text-base opacity-90 group-hover:opacity-100 transition-opacity duration-300">
-                      {category.description}
-                    </p>
-                    <div className="mt-4 flex items-center text-yellow-400 font-medium">
-                      <span className="mr-2">Lihat Koleksi</span>
-                      <svg className="w-5 h-5 transform group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 transition-all duration-500" />
+                    
+                    {/* Content */}
+                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                      <div className="flex items-center mb-2">
+                        {category.icon && (
+                          <span className="text-2xl mr-3">{category.icon}</span>
+                        )}
+                        <h3 className="text-2xl md:text-3xl font-bold tracking-wide group-hover:text-yellow-400 transition-colors duration-300">
+                          {category.nama}
+                        </h3>
+                      </div>
+                      <p className="text-sm md:text-base opacity-90 group-hover:opacity-100 transition-opacity duration-300">
+                         {category.slug?.toLowerCase()} 
+                      </p>
+                      <div className="mt-4 flex items-center text-yellow-400 font-medium">
+                        <span className="mr-2">Lihat Koleksi</span>
+                        <svg className="w-5 h-5 transform group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">Belum ada kategori tersedia</p>
+            </div>
+          )}
         </div>
       </section>
 

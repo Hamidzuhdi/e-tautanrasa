@@ -100,6 +100,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </svg>
             <span className="font-medium">Kategori Produk</span>
           </Link>
+            <Link
+            href="/admin/products"
+            onClick={() => setIsSidebarOpen(false)}
+            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 ${
+              isActive('/admin/products')
+              ? 'bg-gradient-to-r from-rose-500 to-purple-600 text-white shadow-lg'
+              : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+            }`}
+            >
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M6 2a2 2 0 00-2 2v2h16V4a2 2 0 00-2-2H6z" />
+              <path d="M4 8v10a2 2 0 002 2h12a2 2 0 002-2V8H4zm8 2a3 3 0 013 3v1H9v-1a3 3 0 013-3z" />
+            </svg>
+            <span className="font-medium">Produk</span>
+            </Link>
         </nav>
 
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-700">
