@@ -104,28 +104,114 @@ interface Category {
   icon: string | null;
 }
 
+interface Product {
+  id: number;
+  nama: string;
+  slug: string;
+  deskripsi: string | null;
+  harga: number;
+  stok: number;
+  foto1: string | null;
+  foto2: string | null;
+  isActive: boolean;
+  kategori_id: number;
+}
+
 export default function HomePage() {
   const [selectedNews, setSelectedNews] = useState<null | 'collection' | 'collaboration' | 'workshop' | 'gallery'>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [drawstringProducts, setDrawstringProducts] = useState<Product[]>([]);
+  const [charmProducts, setCharmProducts] = useState<Product[]>([]);
+  const [productsLoading, setProductsLoading] = useState(true);
+  
+  // Modal state for product details
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const [addingToCart, setAddingToCart] = useState(false);
 
-  // Fetch categories from API
+  // Modal functions
+  const openModal = (product: Product) => {
+    setSelectedProduct(product);
+    setQuantity(1);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setSelectedProduct(null);
+    setQuantity(1);
+  };
+
+  const handleAddToCart = async () => {
+    if (!selectedProduct) return;
+
+    setAddingToCart(true);
+    try {
+      const response = await fetch('/api/cart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          productId: selectedProduct.id,
+          qty: quantity
+        })
+      });
+
+      if (response.ok) {
+        alert('Produk berhasil ditambahkan ke keranjang!');
+        closeModal();
+      } else {
+        const error = await response.json();
+        alert(error.message || 'Gagal menambahkan ke keranjang');
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      alert('Terjadi kesalahan saat menambahkan ke keranjang');
+    } finally {
+      setAddingToCart(false);
+    }
+  };
+
+  // Fetch categories and products from API
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch('/api/categories');
-        if (response.ok) {
-          const data = await response.json();
-          setCategories(data);
+        // Fetch categories
+        const categoryResponse = await fetch('/api/categories');
+        if (categoryResponse.ok) {
+          const categoryData = await categoryResponse.json();
+          setCategories(categoryData);
+        }
+
+        // Fetch all products
+        const productResponse = await fetch('/api/products');
+        if (productResponse.ok) {
+          const products = await productResponse.json();
+          
+          // Filter products by category names (case-insensitive)
+          const drawstring = products.filter((p: Product & { kategori: { nama: string } }) => 
+            p.kategori?.nama?.toUpperCase() === 'DRAWSTRING COLLECTION'
+          );
+          const charm = products.filter((p: Product & { kategori: { nama: string } }) => 
+            p.kategori?.nama?.toUpperCase() === 'CHARM SERIES'
+          );
+          
+          setDrawstringProducts(drawstring.slice(0, 8)); // Limit to 8 products
+          setCharmProducts(charm.slice(0, 8)); // Limit to 8 products
         }
       } catch (error) {
-        console.error('Error fetching categories:', error);
+        console.error('Error fetching data:', error);
       } finally {
         setCategoriesLoading(false);
+        setProductsLoading(false);
       }
     };
 
-    fetchCategories();
+    fetchData();
   }, []);
 
   return (
@@ -143,7 +229,6 @@ export default function HomePage() {
             <NavigationButtons className="hidden lg:flex space-x-8 xl:space-x-12 text-sm font-medium text-gray-700" />
 
             <div className="flex items-center space-x-4">
-              <span className="text-sm font-medium text-gray-700 hidden sm:block">IDR Rp <span className="font-bold">▽</span></span>
               <SearchInput className="flex" />
               <UserDropdown />
             </div>
@@ -415,112 +500,151 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* New Launching Section (Atala Skirt) - Based on 00:02-00:05 */}
+      {/* New Launching Section - Drawstring Collection */}
       <section id="new-arrival" className="py-8 md:py-12 px-4 md:px-6 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 md:mb-10 text-gray-900">
             New Launching - Drawstring Collection
           </h2>
-          {/* Grid optimized for many items in the video */}
-          {/* <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 md:gap-4 justify-items-center">
-            {[
-              'Pinkies Bumb', 'Moonlit Silvermist', 'Couple Black Light', 'Bloom Stripe Clamp (White Bone)', 'Bloom Stripe Clamp (Maroon)', 'Bloom Stripe Clamp (Milo)', 'Bloom Stripe (Navy)', 
-              'Bloom Stripe (Mauve)', 'Bloom Stripe (Brown)'
-            ].map((productName, index) => {
-              // Generate image path based on product name with special handling for naming inconsistencies
-              let imagePath = `/img/Tautan Rasa - ${productName}.png`;
-              
-              // Handle special case for "Bloom Stripe Clamp (Milo)" which has "Bllom" in filename
-              if (productName === 'Bloom Stripe Clamp (Milo)') {
-                imagePath = '/img/Tautan Rasa - Bllom Stripe Clamp (Milo).png';
-              }
-              // Handle special case for "Bloom Stripe Clamp (White Bone)" which has "Bllom" in filename
-              if (productName === 'Bloom Stripe Clamp (White Bone)') {
-                imagePath = '/img/Tautan Rasa - Bllom Stripe Clamp (White Bone).png';
-              }
-              
-              // Generate href based on product name mapping
-              let productHref = `/products/tautan-rasa-${productName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
-              
-              // Map specific products to Shopee links
-              if (productName === 'Pinkies Bumb') {
-                productHref = 'https://id.shp.ee/C3QXqMn';
-              } else if (productName === 'Moonlit Silvermist') {
-                productHref = 'https://id.shp.ee/togM5cm';
-              } else if (productName === 'Couple Black Light') {
-                productHref = 'https://id.shp.ee/ENbe6Kg';
-              } else if (productName.includes('Bloom Stripe Clamp')) {
-                productHref = 'https://id.shp.ee/wK1NgyB';
-              } else if (productName.includes('Bloom Stripe (')) {
-                productHref = 'https://id.shp.ee/Dq7dLdo';
-              }
-              
-              return (
-                <Link 
-                  key={index} 
-                  href={productHref} 
-                  className="text-center group hover:opacity-80 transition-opacity duration-200 w-full"
+          
+          {productsLoading ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                <div key={i} className="aspect-square bg-gray-200 rounded-lg animate-pulse"></div>
+              ))}
+            </div>
+          ) : drawstringProducts.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="text-6xl mb-4">📦</div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                Belum Ada Produk
+              </h3>
+              <p className="text-gray-600">
+                Koleksi Drawstring akan segera hadir!
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              {drawstringProducts.map((product) => (
+                <div 
+                  key={product.id} 
+                  className="group bg-white rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 cursor-pointer"
+                  onClick={() => openModal(product)}
                 >
-                  <div className="aspect-[3/4] w-full bg-gray-200 rounded-lg shadow-sm overflow-hidden">
-                    <a href={productHref}>
+                  <div className="aspect-square relative overflow-hidden">
+                    {product.foto1 ? (
                       <Image
-                        src={imagePath}
-                        alt={`Tautan Rasa ${productName}`}
-                        width={300}
-                        height={400}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                        src={product.foto1}
+                        alt={product.nama}
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
                       />
-                    </a>
+                    ) : (
+                      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                        <span className="text-gray-400 text-4xl">📷</span>
+                      </div>
+                    )}
+                    
+                    {product.stok === 0 && (
+                      <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-medium">
+                        Habis
+                      </div>
+                    )}
                   </div>
-                  <p className="mt-1 md:mt-2 text-xs md:text-sm text-gray-700 font-medium" data-product-name={`Tautan Rasa ${productName}`}>{productName}</p>
-                </Link>
-              );
-            })}
-          </div> */}
+
+                  <div className="p-4">
+                    <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-rose-600 transition-colors">
+                      {product.nama}
+                    </h3>
+                    
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-bold text-rose-600">
+                        Rp {Number(product.harga).toLocaleString('id-ID')}
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        Stok: {product.stok}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
-      {/* New Launching Section 2 (Charm Series) - 100% FIX: NO BLLOM, NO 404 */}
-<section className="py-8 md:py-12 px-4 md:px-6 bg-white">
-  <div className="max-w-7xl mx-auto">
-    <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 md:mb-10 text-gray-900">
-      Charm Series
-    </h2>
-    {/* <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 md:gap-4 justify-items-center">
-      {[
-        'Ballerina Grace',
-        'Ocean Bloom',
-        'Amora Rose',
-        'Cherry Blossom',
-        'Secret Petal'
-      ].map((productName, index) => {
-        // PAKAI NAMA FILE YANG SAMA DENGAN JUDUL → TIDAK ADA BLLOM
-        const imagePath = `/img/Tautan Rasa - ${productName}.png`;
-
-        return (
-          <Link
-            key={index}
-            href="https://id.shp.ee/hHmUcgC"
-            className="text-center group hover:opacity-80 transition-opacity duration-200 w-full"
-          >
-            <div className="aspect-[3/4] w-full bg-gray-200 rounded-lg shadow-sm overflow-hidden">
-              <Image
-                src={imagePath}
-                alt={`Tautan Rasa ${productName}`}
-                width={300}
-                height={400}
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-              />
+      {/* Charm Series Section */}
+      <section className="py-8 md:py-12 px-4 md:px-6 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 md:mb-10 text-gray-900">
+            Charm Series
+          </h2>
+          
+          {productsLoading ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                <div key={i} className="aspect-square bg-gray-200 rounded-lg animate-pulse"></div>
+              ))}
             </div>
-            <p className="mt-1 md:mt-2 text-xs md:text-sm text-gray-700 font-medium" data-product-name={`Tautan Rasa ${productName} Charm Series`}>
-              {productName}
-            </p>
-          </Link>
-        );
-      })}
-    </div> */}
-  </div>
-</section>
+          ) : charmProducts.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="text-6xl mb-4">📦</div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                Belum Ada Produk
+              </h3>
+              <p className="text-gray-600">
+                Koleksi Charm Series akan segera hadir!
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              {charmProducts.map((product) => (
+                <div 
+                  key={product.id} 
+                  className="group bg-white rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 cursor-pointer"
+                  onClick={() => openModal(product)}
+                >
+                  <div className="aspect-square relative overflow-hidden">
+                    {product.foto1 ? (
+                      <Image
+                        src={product.foto1}
+                        alt={product.nama}
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                        <span className="text-gray-400 text-4xl">📷</span>
+                      </div>
+                    )}
+                    
+                    {product.stok === 0 && (
+                      <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-medium">
+                        Habis
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="p-4">
+                    <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-rose-600 transition-colors">
+                      {product.nama}
+                    </h3>
+                    
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-bold text-rose-600">
+                        Rp {Number(product.harga).toLocaleString('id-ID')}
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        Stok: {product.stok}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* News Section - Full Height with Overlay */}
       <section id='news' className="bg-gray-800 text-white py-8 md:py-12 px-4 md:px-6">
@@ -531,7 +655,7 @@ export default function HomePage() {
           <p className="text-sm md:text-base mb-6 max-w-2xl mx-auto">
             A glimpse into the shared journey—where your stories, moments, and inspirations become part of our handcrafted jewelry collections.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             <div 
               className="relative cursor-pointer hover:transform hover:scale-105 transition-all duration-300 rounded-lg overflow-hidden shadow-xl group h-64 md:h-80"
               onClick={() => setSelectedNews('collection')}
@@ -1121,6 +1245,162 @@ export default function HomePage() {
                   </p>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Product Detail Modal */}
+      {modalOpen && selectedProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+              <h3 className="text-xl font-semibold">Detail Produk</h3>
+              <button
+                onClick={closeModal}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Product Details */}
+            <div className="p-6">
+              {/* Product Images */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                {selectedProduct.foto1 && (
+                  <div className="aspect-square bg-gray-200 rounded-lg overflow-hidden">
+                    <Image
+                      src={selectedProduct.foto1}
+                      alt={selectedProduct.nama}
+                      width={400}
+                      height={400}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                {selectedProduct.foto2 && (
+                  <div className="aspect-square bg-gray-200 rounded-lg overflow-hidden">
+                    <Image
+                      src={selectedProduct.foto2}
+                      alt={`${selectedProduct.nama} - foto 2`}
+                      width={400}
+                      height={400}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                {!selectedProduct.foto1 && !selectedProduct.foto2 && (
+                  <div className="aspect-square bg-gray-200 rounded-lg flex items-center justify-center">
+                    <span className="text-gray-400 text-6xl">📷</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Product Information */}
+              <div className="space-y-4 mb-6">
+                <div>
+                  <h4 className="text-2xl font-bold text-gray-900 mb-2">{selectedProduct.nama}</h4>
+                  <p className="text-sm text-gray-500 font-mono">Slug: {selectedProduct.slug}</p>
+                </div>
+                
+                {selectedProduct.deskripsi && (
+                  <div>
+                    <h5 className="font-semibold text-gray-800 mb-2">Deskripsi:</h5>
+                    <p className="text-gray-600 leading-relaxed">{selectedProduct.deskripsi}</p>
+                  </div>
+                )}
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h5 className="font-semibold text-gray-800 mb-1">Harga:</h5>
+                    <p className="text-2xl font-bold text-rose-600">
+                      Rp {Number(selectedProduct.harga).toLocaleString('id-ID')}
+                    </p>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold text-gray-800 mb-1">Stok:</h5>
+                    <p className={`text-lg font-medium ${
+                      selectedProduct.stok > 0 ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {selectedProduct.stok} unit
+                      {selectedProduct.stok === 0 && (
+                        <span className="block text-sm text-red-500">Stok habis</span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Add to Cart Section */}
+              {selectedProduct.stok > 0 ? (
+                <>
+                  {/* Quantity Selector */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Jumlah
+                    </label>
+                    <div className="flex items-center space-x-3">
+                      <button
+                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                        className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
+                        disabled={quantity <= 1}
+                      >
+                        -
+                      </button>
+                      <span className="w-16 text-center font-medium text-lg">{quantity}</span>
+                      <button
+                        onClick={() => setQuantity(Math.min(selectedProduct.stok, quantity + 1))}
+                        className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
+                        disabled={quantity >= selectedProduct.stok}
+                      >
+                        +
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Maksimal {selectedProduct.stok} item
+                    </p>
+                  </div>
+
+                  {/* Total */}
+                  <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">Total:</span>
+                      <span className="font-bold text-rose-600 text-xl">
+                        Rp {(Number(selectedProduct.harga) * quantity).toLocaleString('id-ID')}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-600 font-medium text-center">
+                    ⚠️ Produk ini sedang tidak tersedia
+                  </p>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex space-x-3">
+                <button
+                  onClick={closeModal}
+                  className="flex-1 py-3 px-6 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                >
+                  Tutup
+                </button>
+                {selectedProduct.stok > 0 && (
+                  <button
+                    onClick={handleAddToCart}
+                    disabled={addingToCart}
+                    className="flex-1 py-3 px-6 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors disabled:opacity-50 font-medium"
+                  >
+                    {addingToCart ? 'Menambahkan...' : 'Tambah ke Keranjang'}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>

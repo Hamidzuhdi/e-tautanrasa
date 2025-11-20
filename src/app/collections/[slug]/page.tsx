@@ -31,6 +31,12 @@ export default function CollectionPage() {
   const [category, setCategory] = useState<Category | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Modal state
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const [addingToCart, setAddingToCart] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -70,6 +76,50 @@ export default function CollectionPage() {
       fetchData();
     }
   }, [slug]);
+
+  const openModal = (product: Product) => {
+    setSelectedProduct(product);
+    setQuantity(1);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setSelectedProduct(null);
+    setQuantity(1);
+  };
+
+  const handleAddToCart = async () => {
+    if (!selectedProduct) return;
+
+    setAddingToCart(true);
+    try {
+      const response = await fetch('/api/cart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          productId: selectedProduct.id,
+          qty: quantity
+        })
+      });
+
+      if (response.ok) {
+        alert('Produk berhasil ditambahkan ke keranjang!');
+        closeModal();
+      } else {
+        const error = await response.json();
+        alert(error.message || 'Gagal menambahkan ke keranjang');
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      alert('Terjadi kesalahan saat menambahkan ke keranjang');
+    } finally {
+      setAddingToCart(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -234,14 +284,10 @@ export default function CollectionPage() {
                   </div>
                   
                   <button 
-                    className={`w-full mt-4 py-2 px-4 rounded-lg font-medium transition-colors ${
-                      product.stok > 0 
-                        ? 'bg-rose-600 text-white hover:bg-rose-700' 
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    }`}
-                    disabled={product.stok === 0}
+                    onClick={() => openModal(product)}
+                    className="w-full mt-4 py-2 px-4 rounded-lg font-medium transition-colors bg-blue-600 text-white hover:bg-blue-700"
                   >
-                    {product.stok > 0 ? 'Lihat Detail' : 'Stok Habis'}
+                    Lihat Detail
                   </button>
                 </div>
               </div>
@@ -273,6 +319,162 @@ export default function CollectionPage() {
           </div>
         </div>
       </footer>
+
+      {/* Product Detail Modal */}
+      {modalOpen && selectedProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+              <h3 className="text-xl font-semibold">Detail Produk</h3>
+              <button
+                onClick={closeModal}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Product Details */}
+            <div className="p-6">
+              {/* Product Images */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                {selectedProduct.foto1 && (
+                  <div className="aspect-square bg-gray-200 rounded-lg overflow-hidden">
+                    <Image
+                      src={selectedProduct.foto1}
+                      alt={selectedProduct.nama}
+                      width={400}
+                      height={400}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                {selectedProduct.foto2 && (
+                  <div className="aspect-square bg-gray-200 rounded-lg overflow-hidden">
+                    <Image
+                      src={selectedProduct.foto2}
+                      alt={`${selectedProduct.nama} - foto 2`}
+                      width={400}
+                      height={400}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                {!selectedProduct.foto1 && !selectedProduct.foto2 && (
+                  <div className="aspect-square bg-gray-200 rounded-lg flex items-center justify-center">
+                    <span className="text-gray-400 text-6xl">📷</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Product Information */}
+              <div className="space-y-4 mb-6">
+                <div>
+                  <h4 className="text-2xl font-bold text-gray-900 mb-2">{selectedProduct.nama}</h4>
+                  <p className="text-sm text-gray-500 font-mono">Slug: {selectedProduct.slug}</p>
+                </div>
+                
+                {selectedProduct.deskripsi && (
+                  <div>
+                    <h5 className="font-semibold text-gray-800 mb-2">Deskripsi:</h5>
+                    <p className="text-gray-600 leading-relaxed">{selectedProduct.deskripsi}</p>
+                  </div>
+                )}
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h5 className="font-semibold text-gray-800 mb-1">Harga:</h5>
+                    <p className="text-2xl font-bold text-rose-600">
+                      Rp {Number(selectedProduct.harga).toLocaleString('id-ID')}
+                    </p>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold text-gray-800 mb-1">Stok:</h5>
+                    <p className={`text-lg font-medium ${
+                      selectedProduct.stok > 0 ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {selectedProduct.stok} unit
+                      {selectedProduct.stok === 0 && (
+                        <span className="block text-sm text-red-500">Stok habis</span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Add to Cart Section */}
+              {selectedProduct.stok > 0 ? (
+                <>
+                  {/* Quantity Selector */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Jumlah
+                    </label>
+                    <div className="flex items-center space-x-3">
+                      <button
+                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                        className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
+                        disabled={quantity <= 1}
+                      >
+                        -
+                      </button>
+                      <span className="w-16 text-center font-medium text-lg">{quantity}</span>
+                      <button
+                        onClick={() => setQuantity(Math.min(selectedProduct.stok, quantity + 1))}
+                        className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
+                        disabled={quantity >= selectedProduct.stok}
+                      >
+                        +
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Maksimal {selectedProduct.stok} item
+                    </p>
+                  </div>
+
+                  {/* Total */}
+                  <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">Total:</span>
+                      <span className="font-bold text-rose-600 text-xl">
+                        Rp {(Number(selectedProduct.harga) * quantity).toLocaleString('id-ID')}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-600 font-medium text-center">
+                    ⚠️ Produk ini sedang tidak tersedia
+                  </p>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex space-x-3">
+                <button
+                  onClick={closeModal}
+                  className="flex-1 py-3 px-6 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                >
+                  Tutup
+                </button>
+                {selectedProduct.stok > 0 && (
+                  <button
+                    onClick={handleAddToCart}
+                    disabled={addingToCart}
+                    className="flex-1 py-3 px-6 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors disabled:opacity-50 font-medium"
+                  >
+                    {addingToCart ? 'Menambahkan...' : 'Tambah ke Keranjang'}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

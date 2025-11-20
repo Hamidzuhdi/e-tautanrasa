@@ -149,20 +149,20 @@ export default function UserDropdown({ className = '' }: UserDropdownProps) {
                   <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
                   </svg>
-                  Dashboard
+                  Dashboard Pesanan
                 </Link>
                 <Link
-                  href="/customer/orders"
+                  href="/customers/orders"
                   className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                   onClick={() => setIsOpen(false)}
                 >
                   <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                   </svg>
-                  Pesanan Saya
+                  Keranjang Saya
                 </Link>
                 <Link
-                  href="/customer/profile"
+                  href="/customers/profile"
                   className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                   onClick={() => setIsOpen(false)}
                 >

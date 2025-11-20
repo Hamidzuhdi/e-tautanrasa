@@ -2,9 +2,10 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET(request: Request, { params }: { params: { categoryId: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ categoryId: string }> }) {
   try {
-    const categoryId = parseInt(params.categoryId);
+    const { categoryId: categoryIdParam } = await params;
+    const categoryId = parseInt(categoryIdParam);
     
     if (isNaN(categoryId)) {
       return NextResponse.json({ message: 'Invalid category ID' }, { status: 400 });
