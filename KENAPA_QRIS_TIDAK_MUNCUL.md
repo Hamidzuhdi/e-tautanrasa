@@ -4,11 +4,6 @@
 
 Saya sudah cek file `.env.local` Anda, dan menemukan:
 
-```
-MIDTRANS_SERVER_KEY=Mid-server-A2zv6vl-sTkcigVIZM6fQxlW  ❌ SALAH!
-MIDTRANS_CLIENT_KEY=Mid-client-wQ4V58kcj7Cb7tW0          ❌ SALAH!
-```
-
 **Masalahnya:**
 1. ❌ Key ini BUKAN Sandbox key (tidak dimulai dengan `SB-Mid-`)
 2. ❌ Key ini kemungkinan **tidak valid** atau **expired**
