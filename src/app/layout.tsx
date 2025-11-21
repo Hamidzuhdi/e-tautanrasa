@@ -28,6 +28,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script 
+          src={
+            process.env.NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION === 'true'
+              ? 'https://app.midtrans.com/snap/snap.js'
+              : 'https://app.sandbox.midtrans.com/snap/snap.js'
+          }
+          data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || ''}
+          async
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

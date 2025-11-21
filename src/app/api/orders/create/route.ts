@@ -49,7 +49,7 @@ export async function POST(request: Request) {
     // === 3. Hitung total ===
     const totalItem = items.reduce((sum: number, i: any) => sum + i.qty, 0);
     const totalHarga = items.reduce((sum: number, i: any) => sum + i.qty * Number(i.product.harga), 0);
-    const grandTotal = totalHarga + shippingCost;
+    const grandTotal = Math.round(totalHarga + shippingCost); // Round to avoid decimal issues
 
     // === 4. Generate Invoice + Counter Harian ===
     const today = new Date().toISOString().slice(0, 10).replace(/-/g, ''); // 20251121

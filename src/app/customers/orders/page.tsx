@@ -321,12 +321,12 @@ export default function CustomerOrdersPage() {
                   >
                     Lanjut Belanja
                   </Link>
-                  <button
-                    className="flex-1 py-3 px-6 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors"
-                    onClick={() => alert('Fitur checkout akan segera hadir!')}
+                  <Link
+                    href="/checkout"
+                    className="flex-1 py-3 px-6 bg-rose-600 text-white text-center rounded-lg hover:bg-rose-700 transition-colors"
                   >
                     Checkout
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
