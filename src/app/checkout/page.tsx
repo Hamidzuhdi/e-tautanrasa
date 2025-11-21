@@ -17,14 +17,18 @@ interface CartItem {
 }
 
 interface Province {
-  province_id: string;
-  province: string;
+  id: number;
+  name: string;
 }
 
 interface City {
-  city_id: string;
+  id: number;
+  label: string;
+  province_name: string;
   city_name: string;
-  postal_code: string;
+  district_name: string;
+  subdistrict_name: string;
+  zip_code: string;
 }
 
 interface ShippingCost {
@@ -55,6 +59,7 @@ export default function CheckoutPage() {
     alamatKirim: '',
     provinceId: '',
     cityId: '',
+    citySearch: '',
     postalCode: '',
   });
 
@@ -109,13 +114,19 @@ export default function CheckoutPage() {
       try {
         const res = await fetch('/api/shipping/provinces');
         const data = await res.json();
-        console.log('Provinces API response:', data); // Debug log
-        console.log('Provinces results:', data.results); // Debug log
-        if (data.results) {
+        console.log('Full API response:', data);
+        console.log('Response type:', typeof data);
+        console.log('Response keys:', Object.keys(data));
+        
+        if (data.results && Array.isArray(data.results)) {
+          console.log('Found provinces:', data.results.length);
+          console.log('First province sample:', data.results[0]);
           setProvinces(data.results);
-          console.log('Provinces set:', data.results.length); // Debug log
+        } else if (data.error) {
+          console.error('API Error:', data.error);
+          console.log('Raw data:', data.rawData);
         } else {
-          console.log('No results in provinces response'); // Debug log
+          console.log('Unexpected response structure:', data);
         }
       } catch (error) {
         console.error('Error loading provinces:', error);
@@ -125,37 +136,25 @@ export default function CheckoutPage() {
     loadProvinces();
   }, [isLoggedIn]);
 
-  // Load cities when province changes
-  useEffect(() => {
-    if (!form.provinceId) {
+  // Search cities function
+  const searchCities = async (searchTerm: string) => {
+    if (searchTerm.length < 3) {
       setCities([]);
       return;
     }
 
-    const loadCities = async () => {
-      try {
-        const res = await fetch(`/api/shipping/cities?province=${form.provinceId}`);
-        const data = await res.json();
-        if (data.results) {
-          setCities(data.results);
-        }
-      } catch (error) {
-        console.error('Error loading cities:', error);
+    try {
+      const res = await fetch(`/api/shipping/cities?search=${encodeURIComponent(searchTerm)}`);
+      const data = await res.json();
+      if (data.results) {
+        setCities(data.results);
       }
-    };
-
-    loadCities();
-  }, [form.provinceId]);
-
-  // Auto-fill postal code when city changes
-  useEffect(() => {
-    if (form.cityId) {
-      const selectedCity = cities.find(c => c.city_id === form.cityId);
-      if (selectedCity?.postal_code) {
-        setForm(prev => ({ ...prev, postalCode: selectedCity.postal_code }));
-      }
+    } catch (error) {
+      console.error('Error searching cities:', error);
     }
-  }, [form.cityId, cities]);
+  };
+
+  // Auto-fill postal code when city changes - now handled in city selection
 
   const calculateShipping = async () => {
     if (!form.cityId) {
@@ -178,8 +177,15 @@ export default function CheckoutPage() {
       });
 
       const data = await res.json();
+      console.log('Shipping cost response:', data);
+      
       if (data.results) {
         setShippingCosts(data.results);
+        
+        // Show note if using mock data
+        if (data.note) {
+          console.warn('Shipping calculation note:', data.note);
+        }
       } else {
         alert('Gagal menghitung ongkir');
       }
@@ -217,9 +223,27 @@ export default function CheckoutPage() {
       });
 
       const data = await res.json();
+      console.log('Order creation response:', data);
 
       if (data.snapToken) {
-        // Open Midtrans QRIS popup
+        // Check if using mock token (for development without Midtrans credentials)
+        if (data.snapToken.startsWith('MOCK-')) {
+          alert(`✅ Order berhasil dibuat!\n\nInvoice: ${data.invoice}\n\n⚠️ MOCK PAYMENT MODE\n\nUntuk menampilkan QRIS code:\n1. Daftar di https://dashboard.sandbox.midtrans.com/register\n2. Dapatkan Server Key & Client Key\n3. Update .env.local\n4. Restart server\n\nLihat MIDTRANS_SETUP_GUIDE.md untuk detail`);
+          
+          // Clear cart and redirect to orders page
+          localStorage.removeItem('cart');
+          router.push(`/customers/orders?success=true&invoice=${data.invoice}`);
+          return;
+        }
+        
+        // Check if Midtrans Snap.js is loaded
+        if (typeof (window as any).snap === 'undefined') {
+          alert('❌ Midtrans Snap.js belum loaded!\n\nPeriksa:\n1. Internet connection\n2. Client Key di .env.local\n3. Script tag di layout.tsx');
+          return;
+        }
+        
+        // Real Midtrans QRIS popup
+        console.log('Opening Midtrans Snap with token:', data.snapToken);
         (window as any).snap.pay(data.snapToken, {
           onSuccess: (result: any) => {
             console.log('Payment success:', result);
@@ -334,13 +358,32 @@ export default function CheckoutPage() {
                   </label>
                   <select
                     value={form.provinceId}
-                    onChange={(e) => setForm({ ...form, provinceId: e.target.value, cityId: '', postalCode: '' })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                    onChange={(e) => {
+                      console.log('Province selected:', e.target.value);
+                      setForm({ ...form, provinceId: e.target.value, cityId: '', postalCode: '' });
+                    }}
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent bg-white text-gray-900"
+                    style={{ 
+                      color: '#111827 !important', 
+                      backgroundColor: '#ffffff !important',
+                      fontSize: '16px',
+                      lineHeight: '1.5'
+                    }}
                   >
-                    <option value="">Pilih Provinsi</option>
+                    <option value="" style={{ color: '#6B7280', backgroundColor: '#ffffff' }}>
+                      Pilih Provinsi ({provinces.length} tersedia)
+                    </option>
                     {provinces.map((prov) => (
-                      <option key={prov.province_id} value={prov.province_id}>
-                        {prov.province}
+                      <option 
+                        key={`province-${prov.id}`} 
+                        value={prov.id.toString()}
+                        style={{ 
+                          color: '#111827 !important', 
+                          backgroundColor: '#ffffff !important',
+                          padding: '8px 12px'
+                        }}
+                      >
+                        {prov.name}
                       </option>
                     ))}
                   </select>
@@ -348,21 +391,39 @@ export default function CheckoutPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Kota/Kabupaten *
+                    Cari Kota/Kabupaten *
                   </label>
-                  <select
-                    value={form.cityId}
-                    onChange={(e) => setForm({ ...form, cityId: e.target.value })}
+                  <input
+                    type="text"
+                    value={form.citySearch || ''}
+                    onChange={(e) => {
+                      setForm({ ...form, citySearch: e.target.value, cityId: '' });
+                      if (e.target.value.length >= 3) {
+                        searchCities(e.target.value);
+                      } else {
+                        setCities([]);
+                      }
+                    }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-                    disabled={!form.provinceId}
-                  >
-                    <option value="">Pilih Kota/Kabupaten</option>
-                    {cities.map((city) => (
-                      <option key={city.city_id} value={city.city_id}>
-                        {city.city_name}
-                      </option>
-                    ))}
-                  </select>
+                    placeholder="Ketik nama kota/kabupaten (min 3 karakter)"
+                  />
+                  {cities.length > 0 && (
+                    <div className="mt-1 max-h-40 overflow-y-auto border border-gray-300 rounded-lg bg-white shadow-lg">
+                      {cities.map((city) => (
+                        <button
+                          key={`city-${city.id}`}
+                          type="button"
+                          onClick={() => {
+                            setForm({ ...form, cityId: city.id.toString(), citySearch: city.label, postalCode: city.zip_code });
+                            setCities([]);
+                          }}
+                          className="w-full text-left px-4 py-2 hover:bg-gray-100 border-b border-gray-100 last:border-b-0"
+                        >
+                          <div className="text-sm font-medium text-gray-900">{city.label}</div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div>

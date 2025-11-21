@@ -46,3 +46,28 @@ html {
 .text-shadow {
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
+
+/* Dropdown styling fixes */
+select {
+  color: #111827 !important;
+  background-color: #ffffff !important;
+}
+
+select option {
+  color: #111827 !important;
+  background-color: #ffffff !important;
+  padding: 8px 12px;
+}
+
+select option:hover,
+select option:focus,
+select option:checked {
+  background-color: #f3f4f6 !important;
+  color: #111827 !important;
+}
+
+/* Force dropdown to be above other elements */
+select:focus {
+  z-index: 50 !important;
+  position: relative;
+}

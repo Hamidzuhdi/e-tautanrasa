@@ -29,14 +29,25 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Midtrans Snap.js - Load based on environment */}
         <script 
-          src={
-            process.env.NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION === 'true'
-              ? 'https://app.midtrans.com/snap/snap.js'
-              : 'https://app.sandbox.midtrans.com/snap/snap.js'
-          }
-          data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || ''}
+          src="https://app.sandbox.midtrans.com/snap/snap.js"
+          data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || 'SB-Mid-client-nZWQ-kJgPOGy5R8J'}
           async
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              console.log('Midtrans Client Key:', '${process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || 'NOT_SET'}');
+              window.addEventListener('load', function() {
+                if (typeof window.snap !== 'undefined') {
+                  console.log('✅ Midtrans Snap.js loaded successfully');
+                } else {
+                  console.warn('⚠️ Midtrans Snap.js NOT loaded - check Client Key');
+                }
+              });
+            `,
+          }}
         />
       </head>
       <body

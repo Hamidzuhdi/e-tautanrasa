@@ -1,0 +1,131 @@
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│   🎯 CARA MENAMPILKAN QRIS CODE MIDTRANS                    │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+
+📝 LANGKAH-LANGKAH:
+
+1️⃣  DAFTAR AKUN MIDTRANS SANDBOX (GRATIS)
+   
+   • Buka browser: https://dashboard.sandbox.midtrans.com/register
+   
+   • Isi form:
+     - Business Name: Tautan Rasa
+     - Email: (email Anda)
+     - Phone: (nomor HP Anda)
+     - Password: (buat password kuat)
+   
+   • Klik "Register"
+   • Check email untuk verifikasi
+   • Klik link verifikasi
+
+
+2️⃣  AMBIL API CREDENTIALS
+
+   • Login ke: https://dashboard.sandbox.midtrans.com
+   
+   • Klik menu "Settings" → "Access Keys"
+   
+   • Anda akan lihat:
+     
+     ┌────────────────────────────────────────┐
+     │ Server Key:                            │
+     │ SB-Mid-server-XXXXXXXXXXXXXXXX         │
+     │                                        │
+     │ Client Key:                            │
+     │ SB-Mid-client-XXXXXXXXXXXXXXXX         │
+     └────────────────────────────────────────┘
+   
+   • COPY kedua key tersebut!
+
+
+3️⃣  UPDATE FILE .env.local
+
+   • Buka file: .env.local
+   
+   • Ganti baris berikut:
+   
+     MIDTRANS_SERVER_KEY=PASTE_YOUR_SERVER_KEY_HERE
+     ↓↓↓ GANTI DENGAN ↓↓↓
+     MIDTRANS_SERVER_KEY=SB-Mid-server-XXXXXXX (yang Anda copy)
+   
+     MIDTRANS_CLIENT_KEY=PASTE_YOUR_CLIENT_KEY_HERE
+     ↓↓↓ GANTI DENGAN ↓↓↓
+     MIDTRANS_CLIENT_KEY=SB-Mid-client-XXXXXXX (yang Anda copy)
+   
+     NEXT_PUBLIC_MIDTRANS_CLIENT_KEY=PASTE_YOUR_CLIENT_KEY_HERE
+     ↓↓↓ GANTI DENGAN ↓↓↓
+     NEXT_PUBLIC_MIDTRANS_CLIENT_KEY=SB-Mid-client-XXXXXXX (yang Anda copy)
+   
+   • SAVE file .env.local
+
+
+4️⃣  RESTART SERVER
+
+   • Stop server (tekan Ctrl+C di terminal)
+   
+   • Jalankan lagi:
+     npm run dev
+   
+   • Tunggu sampai muncul:
+     ✓ Ready in XXXXms
+
+
+5️⃣  TEST PAYMENT
+
+   • Buka browser: http://localhost:3000
+   
+   • Login dengan akun customer
+   
+   • Tambahkan produk ke cart
+   
+   • Klik Checkout
+   
+   • Isi form alamat pengiriman
+   
+   • Hitung ongkir → Pilih courier
+   
+   • Klik "Bayar Sekarang dengan QRIS"
+   
+   • ✅ POPUP MIDTRANS MUNCUL dengan QRIS CODE!
+
+
+6️⃣  SCAN QRIS CODE
+
+   Untuk testing, bisa pakai:
+   
+   • Gopay (Gojek app)
+   • OVO
+   • Dana
+   • ShopeePay
+   • LinkAja
+   • Bank apps yang support QRIS
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❓ TROUBLESHOOTING
+
+Problem: Popup tidak muncul, malah alert "MOCK PAYMENT"
+✅ Solution: Anda belum update .env.local dengan credentials yang benar
+          Ulangi step 3 dan 4
+
+Problem: Error 401 Unauthorized
+✅ Solution: Server Key salah. Periksa kembali di Midtrans dashboard
+
+Problem: QRIS tidak muncul di popup
+✅ Solution: Pastikan NEXT_PUBLIC_MIDTRANS_CLIENT_KEY sudah di-set
+
+Problem: Console error "snap is not defined"
+✅ Solution: Midtrans Snap.js belum loaded. Check internet connection
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📞 BUTUH BANTUAN?
+
+• Midtrans Docs: https://docs.midtrans.com
+• Support: https://support.midtrans.com
+• Lihat file: MIDTRANS_SETUP_GUIDE.md
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
