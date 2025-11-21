@@ -146,6 +146,7 @@ model Order {
   paidAt            DateTime?     @map("paid_at")
   createdAt         DateTime      @default(now()) @map("created_at")
   updatedAt         DateTime      @updatedAt @map("updated_at")
+  invoiceCounter    Int?
 
   user              User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
   province          Province?     @relation(fields: [provinceId], references: [id])
