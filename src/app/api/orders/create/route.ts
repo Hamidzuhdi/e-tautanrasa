@@ -129,7 +129,8 @@ export async function POST(request: NextRequest) {
           name: `Ongkir - ${shippingService}`,
         },
       ],
-      enabled_payments: ['qris'],
+      // enabled_payments removed - will show all available payment methods
+      // If you want only QRIS, enable it in Midtrans Dashboard: Settings → Payment Channels
     };
 
     console.log('Creating Midtrans transaction with parameter:', JSON.stringify(parameter, null, 2));

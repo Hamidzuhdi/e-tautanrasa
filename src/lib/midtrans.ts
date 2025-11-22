@@ -7,6 +7,13 @@ const baseUrl = isProduction
   ? 'https://app.midtrans.com/snap/v1' 
   : 'https://app.sandbox.midtrans.com/snap/v1';
 
+console.log('🔍 Midtrans Config:', {
+  serverKey: serverKey.substring(0, 15) + '...',
+  isProduction,
+  baseUrl,
+  hasValidKey: serverKey.startsWith('SB-Mid-')
+});
+
 export const snap = {
   createTransaction: async (parameter: any) => {
     const authString = Buffer.from(serverKey + ':').toString('base64');

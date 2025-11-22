@@ -19,6 +19,12 @@ export async function POST(request: NextRequest) {
       signature_key,
       payment_type,
       transaction_id,
+      va_numbers,
+      bill_key,
+      biller_code,
+      expiry_time,
+      pdf_url,
+      finish_redirect_url,
     } = body;
 
     console.log('Midtrans Webhook received:', {
@@ -26,6 +32,7 @@ export async function POST(request: NextRequest) {
       transaction_status,
       fraud_status,
       status_code,
+      payment_type,
     });
 
     // === 1. VERIFIKASI SIGNATURE ===
@@ -101,6 +108,8 @@ export async function POST(request: NextRequest) {
       });
 
       // Upsert Payment record
+      const vaNumber = va_numbers && va_numbers.length > 0 ? va_numbers[0].va_number : null;
+      
       await tx.payment.upsert({
         where: { orderId: order.id },
         create: {
@@ -111,11 +120,23 @@ export async function POST(request: NextRequest) {
           transactionId: transaction_id,
           transactionStatus: transaction_status,
           fraudStatus: fraud_status,
+          vaNumber: vaNumber,
+          billKey: bill_key,
+          billerCode: biller_code,
+          expiryTime: expiry_time ? new Date(expiry_time) : null,
+          pdfUrl: pdf_url,
+          finishRedirectUrl: finish_redirect_url,
           rawJson: body,
         },
         update: {
           transactionStatus: transaction_status,
           fraudStatus: fraud_status,
+          vaNumber: vaNumber,
+          billKey: bill_key,
+          billerCode: biller_code,
+          expiryTime: expiry_time ? new Date(expiry_time) : null,
+          pdfUrl: pdf_url,
+          finishRedirectUrl: finish_redirect_url,
           rawJson: body,
         },
       });

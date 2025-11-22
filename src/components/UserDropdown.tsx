@@ -142,7 +142,7 @@ export default function UserDropdown({ className = '' }: UserDropdownProps) {
             {user.role === 'CUSTOMER' && (
               <>
                 <Link
-                  href="/customer/dashboard"
+                  href="/customers/dashboard"
                   className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                   onClick={() => setIsOpen(false)}
                 >
