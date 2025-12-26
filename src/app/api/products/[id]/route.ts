@@ -4,8 +4,9 @@ import { prisma } from '@/lib/prisma';
 import { writeFile, unlink } from 'fs/promises';
 import path from 'path';
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
-  const id = parseInt(params.id);
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id: paramId } = await params;
+  const id = parseInt(paramId);
   const formData = await request.formData();
 
   const nama = formData.get('nama') as string;
@@ -82,8 +83,9 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
-  const id = parseInt(params.id);
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id: paramId } = await params;
+  const id = parseInt(paramId);
   try {
     const product = await prisma.product.findUnique({ where: { id: BigInt(id) } });
     if (!product) return NextResponse.json({ message: 'Tidak ditemukan' }, { status: 404 });
